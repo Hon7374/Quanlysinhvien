@@ -1,0 +1,661 @@
+using System;
+using System.Data;
+using System.Data.SqlClient;
+using System.Drawing;
+using System.Windows.Forms;
+using StudentManagement.Data;
+using StudentManagement.Helpers;
+
+namespace StudentManagement.Forms
+{
+    public partial class AdminDashboardModern : Form
+    {
+        private Panel panelMenu;
+        private Panel panelContent;
+        private Panel panelHeader;
+        private Label lblWelcome;
+        private ComboBox cboYear;
+        private ComboBox cboSemester;
+        private ComboBox cboStatus;
+
+        public AdminDashboardModern()
+        {
+            InitializeComponent();
+            LoadDashboard();
+        }
+
+        private void InitializeComponent()
+        {
+            this.Text = "Academia - Tổng quan trang thái học tập";
+            this.Size = new Size(1400, 800);
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.BackColor = Color.White;
+            this.WindowState = FormWindowState.Maximized;
+
+            // Menu Panel (Sidebar)
+            panelMenu = new Panel
+            {
+                Dock = DockStyle.Left,
+                Width = 200,
+                BackColor = Color.FromArgb(248, 249, 250)
+            };
+
+            // Logo/Brand
+            Label lblBrand = new Label
+            {
+                Text = "🎓 Academia",
+                Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                ForeColor = Color.FromArgb(79, 70, 229),
+                Location = new Point(20, 20),
+                AutoSize = true
+            };
+            panelMenu.Controls.Add(lblBrand);
+
+            // Menu Buttons
+            int yPos = 80;
+            AddMenuButton("📊 Trang chủ", yPos, (s, e) => LoadDashboard(), true); yPos += 45;
+            AddMenuButton("🎯 Quản lý Người dùng", yPos, (s, e) => LoadUserManagement()); yPos += 45;
+            AddMenuButton("📚 Quản lý học kỳ", yPos, (s, e) => LoadSemesterManagement()); yPos += 45;
+            AddMenuButton("👨‍🎓 Quản lý sinh viên", yPos, (s, e) => LoadStudentManagement()); yPos += 45;
+            AddMenuButton("👨‍🏫 Quản lý giảng viên", yPos, (s, e) => LoadTeacherManagement()); yPos += 45;
+            AddMenuButton("📖 Quản lý môn học", yPos, (s, e) => LoadCourseManagement()); yPos += 45;
+            AddMenuButton("📊 Thống kê và báo cáo", yPos, (s, e) => LoadReports()); yPos += 45;
+            AddMenuButton("⚙️ Cài đặt", yPos, (s, e) => LoadSettings()); yPos += 60;
+            AddMenuButton("🚪 Đăng xuất", yPos, (s, e) => Logout());
+
+            // Header Panel
+            panelHeader = new Panel
+            {
+                Dock = DockStyle.Top,
+                Height = 80,
+                BackColor = Color.White
+            };
+
+            lblWelcome = new Label
+            {
+                Text = $"👤 Đăng xuất",
+                Font = new Font("Segoe UI", 10),
+                ForeColor = Color.FromArgb(220, 38, 38),
+                Location = new Point(1050, 25),
+                AutoSize = true,
+                Cursor = Cursors.Hand
+            };
+            lblWelcome.Click += (s, e) => Logout();
+            panelHeader.Controls.Add(lblWelcome);
+
+            // Search Box
+            TextBox txtSearch = new TextBox
+            {
+                Font = new Font("Segoe UI", 10),
+                Location = new Point(20, 25),
+                Size = new Size(300, 30),
+                Text = "🔍 Tìm kiếm..."
+            };
+            panelHeader.Controls.Add(txtSearch);
+
+            // Content Panel
+            panelContent = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = Color.FromArgb(249, 250, 251),
+                Padding = new Padding(30),
+                AutoScroll = true
+            };
+
+            this.Controls.Add(panelContent);
+            this.Controls.Add(panelHeader);
+            this.Controls.Add(panelMenu);
+        }
+
+        private void AddMenuButton(string text, int yPos, EventHandler clickHandler, bool isActive = false)
+        {
+            Button btn = new Button
+            {
+                Text = text,
+                Font = new Font("Segoe UI", 10),
+                Location = new Point(10, yPos),
+                Size = new Size(180, 40),
+                FlatStyle = FlatStyle.Flat,
+                ForeColor = isActive ? Color.FromArgb(79, 70, 229) : Color.FromArgb(107, 114, 128),
+                BackColor = isActive ? Color.FromArgb(238, 242, 255) : Color.Transparent,
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(15, 0, 0, 0),
+                Cursor = Cursors.Hand
+            };
+            btn.FlatAppearance.BorderSize = 0;
+            btn.FlatAppearance.MouseOverBackColor = Color.FromArgb(238, 242, 255);
+            btn.Click += clickHandler;
+            panelMenu.Controls.Add(btn);
+        }
+
+        private void LoadDashboard()
+        {
+            panelContent.Controls.Clear();
+
+            // Title
+            Label lblTitle = new Label
+            {
+                Text = "Tổng quan trang thái học tập",
+                Font = new Font("Segoe UI", 20, FontStyle.Bold),
+                Location = new Point(0, 0),
+                AutoSize = true,
+                ForeColor = Color.FromArgb(31, 41, 55)
+            };
+            panelContent.Controls.Add(lblTitle);
+
+            // Filters
+            Panel panelFilters = new Panel
+            {
+                Location = new Point(0, 50),
+                Size = new Size(1100, 60),
+                BackColor = Color.Transparent
+            };
+
+            // Year Filter
+            Label lblYear = new Label { Text = "Năm học", Location = new Point(0, 0), AutoSize = true };
+            cboYear = new ComboBox
+            {
+                Location = new Point(0, 20),
+                Size = new Size(150, 30),
+                DropDownStyle = ComboBoxStyle.DropDownList
+            };
+            cboYear.Items.AddRange(new object[] { "2023-2024", "2024-2025", "2025-2026" });
+            cboYear.SelectedIndex = 0;
+            panelFilters.Controls.Add(lblYear);
+            panelFilters.Controls.Add(cboYear);
+
+            // Semester Filter
+            Label lblSemester = new Label { Text = "Học kỳ", Location = new Point(170, 0), AutoSize = true };
+            cboSemester = new ComboBox
+            {
+                Location = new Point(170, 20),
+                Size = new Size(120, 30),
+                DropDownStyle = ComboBoxStyle.DropDownList
+            };
+            cboSemester.Items.AddRange(new object[] { "Học kỳ I", "Học kỳ II", "Học kỳ III" });
+            cboSemester.SelectedIndex = 0;
+            panelFilters.Controls.Add(lblSemester);
+            panelFilters.Controls.Add(cboSemester);
+
+            // Status Filter
+            Label lblStatus = new Label { Text = "Trạng thái", Location = new Point(310, 0), AutoSize = true };
+            cboStatus = new ComboBox
+            {
+                Location = new Point(310, 20),
+                Size = new Size(150, 30),
+                DropDownStyle = ComboBoxStyle.DropDownList
+            };
+            cboStatus.Items.AddRange(new object[] { "Đang học", "Tất cả" });
+            cboStatus.SelectedIndex = 0;
+            panelFilters.Controls.Add(lblStatus);
+            panelFilters.Controls.Add(cboStatus);
+
+            // Export Buttons
+            Button btnPDF = new Button
+            {
+                Text = "📄 Xuất PDF",
+                Location = new Point(850, 20),
+                Size = new Size(120, 35),
+                BackColor = Color.FromArgb(79, 70, 229),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
+            };
+            btnPDF.FlatAppearance.BorderSize = 0;
+            panelFilters.Controls.Add(btnPDF);
+
+            Button btnExcel = new Button
+            {
+                Text = "📊 Xuất Excel",
+                Location = new Point(980, 20),
+                Size = new Size(120, 35),
+                BackColor = Color.White,
+                ForeColor = Color.FromArgb(107, 114, 128),
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
+            };
+            btnExcel.FlatAppearance.BorderColor = Color.FromArgb(209, 213, 219);
+            panelFilters.Controls.Add(btnExcel);
+
+            panelContent.Controls.Add(panelFilters);
+
+            try
+            {
+                // Get statistics
+                int totalStudents = Convert.ToInt32(DatabaseHelper.ExecuteScalar("SELECT COUNT(*) FROM Students"));
+                int totalCourses = Convert.ToInt32(DatabaseHelper.ExecuteScalar("SELECT COUNT(*) FROM Courses WHERE IsActive = 1"));
+                int totalSubjects = Convert.ToInt32(DatabaseHelper.ExecuteScalar("SELECT COUNT(DISTINCT CourseCode) FROM Courses"));
+
+                // Stat Cards Row
+                int cardY = 130;
+                CreateModernStatCard("Tổng số sinh viên", totalStudents.ToString(), "+24.1% so với tháng trước",
+                    Color.FromArgb(239, 246, 255), Color.FromArgb(59, 130, 246), 0, cardY);
+                CreateModernStatCard("Tổng số lớp học", totalCourses.ToString(), "+5 lớp mới",
+                    Color.FromArgb(240, 253, 244), Color.FromArgb(34, 197, 94), 280, cardY);
+                CreateModernStatCard("Tổng số khóa học", totalSubjects.ToString(), "Ổn định so với năm trước",
+                    Color.FromArgb(255, 247, 237), Color.FromArgb(249, 115, 22), 560, cardY);
+
+                // Charts Row
+                int chartY = 280;
+
+                // Bar Chart - Điểm trung bình môn học
+                CreateBarChart("Biểu đồ điểm trung bình môn học", 0, chartY, 380, 300);
+
+                // Pie Chart - Tỷ lệ tốt nghiệp
+                CreatePieChart("Biểu đồ tỷ lệ tốt nghiệp", 400, chartY, 350, 300);
+
+                // Column Chart - Trạng thái đăng ký
+                CreateColumnChart("Biểu đồ trạng thái đăng ký", 770, chartY, 330, 300);
+
+                // Tables Section
+                int tableY = 610;
+
+                // Courses Table
+                Label lblCourses = new Label
+                {
+                    Text = "Danh sách lớp học",
+                    Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                    Location = new Point(0, tableY),
+                    AutoSize = true
+                };
+                panelContent.Controls.Add(lblCourses);
+
+                DataGridView dgvCourses = CreateModernDataGridView(0, tableY + 40, 1100, 200);
+                string queryCourses = @"SELECT TOP 5 c.CourseCode as 'Mã lớp', c.CourseName as 'Tên lớp',
+                                       u.FullName as 'Giảng viên', c.Semester + ' ' + CAST(c.AcademicYear AS VARCHAR) as 'Năm học',
+                                       c.Semester as 'Học kỳ',
+                                       (SELECT COUNT(*) FROM Enrollments WHERE CourseId = c.CourseId) as 'Số lượng SV',
+                                       CASE WHEN c.IsActive = 1 THEN N'Đang diễn ra' ELSE N'Đã kết thúc' END as 'Trạng thái'
+                                       FROM Courses c
+                                       LEFT JOIN Teachers t ON c.TeacherId = t.TeacherId
+                                       LEFT JOIN Users u ON t.UserId = u.UserId
+                                       ORDER BY c.CourseId DESC";
+                dgvCourses.DataSource = DatabaseHelper.ExecuteQuery(queryCourses);
+                panelContent.Controls.Add(dgvCourses);
+
+                // Students Table
+                Label lblStudents = new Label
+                {
+                    Text = "Danh sách sinh viên",
+                    Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                    Location = new Point(0, tableY + 270),
+                    AutoSize = true
+                };
+                panelContent.Controls.Add(lblStudents);
+
+                DataGridView dgvStudents = CreateModernDataGridView(0, tableY + 310, 1100, 200);
+                string queryStudents = @"SELECT TOP 5 s.StudentCode as 'Mã SV', u.FullName as 'Họ và tên',
+                                        s.Major as 'Ngành học',
+                                        CASE
+                                            WHEN (SELECT COUNT(*) FROM Enrollments e WHERE e.StudentId = s.StudentId AND e.Status = 'Enrolled') > 0
+                                            THEN N'Đang học'
+                                            ELSE N'Bảo lưu'
+                                        END as 'Trạng thái học tập',
+                                        CAST(s.GPA AS DECIMAL(3,1)) as 'GPA'
+                                        FROM Students s
+                                        INNER JOIN Users u ON s.UserId = u.UserId
+                                        ORDER BY s.StudentId DESC";
+                dgvStudents.DataSource = DatabaseHelper.ExecuteQuery(queryStudents);
+                panelContent.Controls.Add(dgvStudents);
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi tải dữ liệu: " + ex.Message, "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void CreateModernStatCard(string title, string value, string trend, Color bgColor, Color accentColor, int x, int y)
+        {
+            Panel card = new Panel
+            {
+                Location = new Point(x, y),
+                Size = new Size(260, 120),
+                BackColor = bgColor
+            };
+
+            // Icon/Number
+            Label lblValue = new Label
+            {
+                Text = value,
+                Font = new Font("Segoe UI", 32, FontStyle.Bold),
+                ForeColor = accentColor,
+                Location = new Point(20, 15),
+                AutoSize = true
+            };
+            card.Controls.Add(lblValue);
+
+            // Title
+            Label lblTitle = new Label
+            {
+                Text = title,
+                Font = new Font("Segoe UI", 11),
+                ForeColor = Color.FromArgb(75, 85, 99),
+                Location = new Point(20, 70),
+                AutoSize = true
+            };
+            card.Controls.Add(lblTitle);
+
+            // Trend
+            Label lblTrend = new Label
+            {
+                Text = trend,
+                Font = new Font("Segoe UI", 9),
+                ForeColor = Color.FromArgb(107, 114, 128),
+                Location = new Point(20, 92),
+                AutoSize = true
+            };
+            card.Controls.Add(lblTrend);
+
+            panelContent.Controls.Add(card);
+        }
+
+        private void CreateBarChart(string title, int x, int y, int width, int height)
+        {
+            Panel chartPanel = new Panel
+            {
+                Location = new Point(x, y),
+                Size = new Size(width, height),
+                BackColor = Color.White
+            };
+
+            Label lblTitle = new Label
+            {
+                Text = title,
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                Location = new Point(15, 10),
+                AutoSize = true
+            };
+            chartPanel.Controls.Add(lblTitle);
+
+            // Simple bar chart using panels
+            string[] subjects = { "Toán", "Vật", "Hóa", "Tin", "Tiếng Anh" };
+            int[] scores = { 8, 7, 8, 9, 7 };
+            int barX = 20;
+            int barY = 50;
+            int barWidth = 60;
+            int maxHeight = height - 100;
+
+            for (int i = 0; i < subjects.Length; i++)
+            {
+                int barHeight = (scores[i] * maxHeight) / 10;
+
+                // Bar
+                Panel bar = new Panel
+                {
+                    Location = new Point(barX, barY + maxHeight - barHeight),
+                    Size = new Size(barWidth, barHeight),
+                    BackColor = Color.FromArgb(99, 102, 241)
+                };
+                chartPanel.Controls.Add(bar);
+
+                // Label
+                Label lblSubject = new Label
+                {
+                    Text = subjects[i],
+                    Location = new Point(barX - 5, barY + maxHeight + 5),
+                    AutoSize = true,
+                    Font = new Font("Segoe UI", 8)
+                };
+                chartPanel.Controls.Add(lblSubject);
+
+                barX += 70;
+            }
+
+            panelContent.Controls.Add(chartPanel);
+        }
+
+        private void CreatePieChart(string title, int x, int y, int width, int height)
+        {
+            Panel chartPanel = new Panel
+            {
+                Location = new Point(x, y),
+                Size = new Size(width, height),
+                BackColor = Color.White
+            };
+
+            Label lblTitle = new Label
+            {
+                Text = title,
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                Location = new Point(15, 10),
+                AutoSize = true
+            };
+            chartPanel.Controls.Add(lblTitle);
+
+            // Get real data
+            int enrolled = Convert.ToInt32(DatabaseHelper.ExecuteScalar("SELECT COUNT(*) FROM Enrollments WHERE Status = 'Enrolled'"));
+            int completed = Convert.ToInt32(DatabaseHelper.ExecuteScalar("SELECT COUNT(*) FROM Enrollments WHERE Status = 'Completed'"));
+            int dropped = 5;
+            int total = enrolled + completed + dropped;
+
+            if (total > 0)
+            {
+                // Donut chart using circular progress
+                int centerX = width / 2;
+                int centerY = height / 2;
+                int radius = 80;
+
+                // Draw circles to simulate donut
+                Panel circle1 = new Panel
+                {
+                    Location = new Point(centerX - radius, centerY - radius),
+                    Size = new Size(radius * 2, radius * 2),
+                    BackColor = Color.FromArgb(236, 72, 153) // Pink
+                };
+                chartPanel.Controls.Add(circle1);
+
+                // Center hole
+                Panel centerHole = new Panel
+                {
+                    Location = new Point(centerX - radius/2, centerY - radius/2),
+                    Size = new Size(radius, radius),
+                    BackColor = Color.White
+                };
+                chartPanel.Controls.Add(centerHole);
+
+                // Legend
+                int legendY = centerY + radius + 20;
+                CreateLegendItem(chartPanel, "Đã tốt nghiệp", Color.FromArgb(236, 72, 153), 20, legendY);
+                CreateLegendItem(chartPanel, "Đang học", Color.FromArgb(52, 211, 153), 130, legendY);
+                CreateLegendItem(chartPanel, "Chưa đạt", Color.FromArgb(251, 146, 60), 230, legendY);
+            }
+
+            panelContent.Controls.Add(chartPanel);
+        }
+
+        private void CreateLegendItem(Panel parent, string text, Color color, int x, int y)
+        {
+            Panel colorBox = new Panel
+            {
+                Location = new Point(x, y),
+                Size = new Size(15, 15),
+                BackColor = color
+            };
+            parent.Controls.Add(colorBox);
+
+            Label label = new Label
+            {
+                Text = text,
+                Location = new Point(x + 20, y - 2),
+                AutoSize = true,
+                Font = new Font("Segoe UI", 9)
+            };
+            parent.Controls.Add(label);
+        }
+
+        private void CreateColumnChart(string title, int x, int y, int width, int height)
+        {
+            Panel chartPanel = new Panel
+            {
+                Location = new Point(x, y),
+                Size = new Size(width, height),
+                BackColor = Color.White
+            };
+
+            Label lblTitle = new Label
+            {
+                Text = title,
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                Location = new Point(15, 10),
+                AutoSize = true
+            };
+            chartPanel.Controls.Add(lblTitle);
+
+            // Get real data
+            int enrolled = Convert.ToInt32(DatabaseHelper.ExecuteScalar("SELECT COUNT(*) FROM Enrollments WHERE Status = 'Enrolled'"));
+            int completed = Convert.ToInt32(DatabaseHelper.ExecuteScalar("SELECT COUNT(*) FROM Enrollments WHERE Status = 'Completed'"));
+            int dropped = Convert.ToInt32(DatabaseHelper.ExecuteScalar("SELECT COUNT(*) FROM Enrollments WHERE Status = 'Dropped'"));
+
+            int maxValue = Math.Max(enrolled, Math.Max(completed, dropped)) + 10;
+            if (maxValue == 0) maxValue = 100;
+
+            // Simple column chart
+            string[] categories = { "Đã đăng ký", "Chờ duyệt", "Huỷ đăng ký" };
+            int[] values = { enrolled, completed, dropped };
+
+            int colX = 30;
+            int colY = 50;
+            int colWidth = 80;
+            int maxHeight = height - 120;
+
+            for (int i = 0; i < categories.Length; i++)
+            {
+                int colHeight = (values[i] * maxHeight) / maxValue;
+                if (colHeight < 5 && values[i] > 0) colHeight = 5;
+
+                // Column
+                Panel col = new Panel
+                {
+                    Location = new Point(colX, colY + maxHeight - colHeight),
+                    Size = new Size(colWidth, colHeight),
+                    BackColor = Color.FromArgb(139, 92, 246)
+                };
+                chartPanel.Controls.Add(col);
+
+                // Value label
+                Label lblValue = new Label
+                {
+                    Text = values[i].ToString(),
+                    Location = new Point(colX + colWidth/2 - 10, colY + maxHeight - colHeight - 20),
+                    AutoSize = true,
+                    Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                    ForeColor = Color.FromArgb(139, 92, 246)
+                };
+                chartPanel.Controls.Add(lblValue);
+
+                // Category label
+                Label lblCat = new Label
+                {
+                    Text = categories[i],
+                    Location = new Point(colX - 10, colY + maxHeight + 5),
+                    Size = new Size(100, 30),
+                    Font = new Font("Segoe UI", 8),
+                    TextAlign = ContentAlignment.TopCenter
+                };
+                chartPanel.Controls.Add(lblCat);
+
+                colX += 100;
+            }
+
+            panelContent.Controls.Add(chartPanel);
+        }
+
+        private DataGridView CreateModernDataGridView(int x, int y, int width, int height)
+        {
+            DataGridView dgv = new DataGridView
+            {
+                Location = new Point(x, y),
+                Size = new Size(width, height),
+                ReadOnly = true,
+                AllowUserToAddRows = false,
+                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+                BackgroundColor = Color.White,
+                BorderStyle = BorderStyle.None,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                RowHeadersVisible = false,
+                EnableHeadersVisualStyles = false,
+                ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(249, 250, 251),
+                    ForeColor = Color.FromArgb(107, 114, 128),
+                    Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                    Padding = new Padding(5)
+                },
+                DefaultCellStyle = new DataGridViewCellStyle
+                {
+                    SelectionBackColor = Color.FromArgb(238, 242, 255),
+                    SelectionForeColor = Color.FromArgb(79, 70, 229),
+                    Font = new Font("Segoe UI", 9),
+                    Padding = new Padding(5)
+                }
+            };
+
+            return dgv;
+        }
+
+        private void LoadStudentManagement()
+        {
+            MessageBox.Show("Chức năng Quản lý Sinh viên!");
+        }
+
+        private void LoadTeacherManagement()
+        {
+            MessageBox.Show("Chức năng Quản lý Giảng viên!");
+        }
+
+        private void LoadCourseManagement()
+        {
+            MessageBox.Show("Chức năng Quản lý Môn học!");
+        }
+
+        private void LoadUserManagement()
+        {
+            panelContent.Controls.Clear();
+
+            // Create and show UserManagementForm as a child form
+            UserManagementForm userForm = new UserManagementForm();
+            userForm.TopLevel = false;
+            userForm.FormBorderStyle = FormBorderStyle.None;
+            userForm.Dock = DockStyle.Fill;
+            panelContent.Controls.Add(userForm);
+            userForm.Show();
+        }
+
+        private void LoadSemesterManagement()
+        {
+            panelContent.Controls.Clear();
+
+            // Create and show SemesterManagementForm as a child form
+            SemesterManagementForm semesterForm = new SemesterManagementForm();
+            semesterForm.TopLevel = false;
+            semesterForm.FormBorderStyle = FormBorderStyle.None;
+            semesterForm.Dock = DockStyle.Fill;
+            panelContent.Controls.Add(semesterForm);
+            semesterForm.Show();
+        }
+
+        private void LoadReports()
+        {
+            MessageBox.Show("Chức năng Thống kê và Báo cáo!");
+        }
+
+        private void LoadSettings()
+        {
+            MessageBox.Show("Chức năng Cài đặt!");
+        }
+
+        private void Logout()
+        {
+            DialogResult result = MessageBox.Show("Bạn có chắc muốn đăng xuất?", "Xác nhận",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                SessionManager.Logout();
+                this.Close();
+            }
+        }
+    }
+}

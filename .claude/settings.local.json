@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir /B \"c:\\Users\\phuy1\\Documents\\QuanLySinhVien\")",
+      "Bash(cat:*)",
+      "Bash(\"c:\\Users\\phuy1\\Documents\\QuanLySinhVien\\Program.cs\")",
+      "Bash(\"c:\\Users\\phuy1\\Documents\\QuanLySinhVien\\App.config\")",
+      "Bash(\"c:\\Users\\phuy1\\Documents\\QuanLySinhVien\\StudentManagement.csproj\")",
+      "Bash(dotnet restore:*)",
+      "Bash(dotnet new:*)",
+      "Bash(dotnet sln:*)",
+      "Bash(dotnet build:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
