@@ -21,6 +21,7 @@ namespace StudentManagement.Forms
         {
             InitializeComponent();
             LoadUsers();
+            this.Resize += UserManagementForm_Resize;
         }
 
         private void InitializeComponent()
@@ -187,14 +188,14 @@ namespace StudentManagement.Forms
             dgvUsers = new DataGridView
             {
                 Location = new Point(0, 100),
-                Size = new Size(1340, 600),
+                Size = new Size(1320, 550),
                 ReadOnly = false,
                 AllowUserToAddRows = false,
                 AllowUserToDeleteRows = false,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
                 BackgroundColor = Color.White,
                 BorderStyle = BorderStyle.None,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None,
                 RowHeadersVisible = false,
                 EnableHeadersVisualStyles = false,
                 ColumnHeadersHeight = 50,
@@ -239,7 +240,8 @@ namespace StudentManagement.Forms
                                 END as 'VAI TRÒ',
                                 FORMAT(u.LastLogin, 'yyyy-MM-dd') as 'ĐĂNG NHẬP GẦN NHẤT',
                                 CASE WHEN u.IsActive = 1 THEN N'Hoạt động' ELSE N'Khóa' END as 'TRẠNG THÁI',
-                                u.IsActive
+                                u.IsActive,
+                                CASE WHEN u.IsActive = 1 THEN 'ON' ELSE 'OFF' END as 'Toggle'
                                 FROM Users u
                                 ORDER BY u.UserId DESC";
 
@@ -251,6 +253,20 @@ namespace StudentManagement.Forms
                     dgvUsers.Columns["UserId"].Visible = false;
                     dgvUsers.Columns["FullName"].Visible = false;
                     dgvUsers.Columns["IsActive"].Visible = false;
+
+                    // Set column widths
+                    dgvUsers.Columns["TÊN NGƯỜI DÙNG"].Width = 180;
+                    dgvUsers.Columns["EMAIL"].Width = 220;
+                    dgvUsers.Columns["VAI TRÒ"].Width = 150;
+                    dgvUsers.Columns["ĐĂNG NHẬP GẦN NHẤT"].Width = 180;
+                    dgvUsers.Columns["TRẠNG THÁI"].Width = 120;
+                    dgvUsers.Columns["Toggle"].Width = 120;
+
+                    // Style Toggle column
+                    dgvUsers.Columns["Toggle"].HeaderText = "KÍCH HOẠT";
+                    dgvUsers.Columns["Toggle"].ReadOnly = true;
+                    dgvUsers.Columns["Toggle"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                    dgvUsers.Columns["Toggle"].DefaultCellStyle.Font = new Font("Segoe UI", 9, FontStyle.Bold);
 
                     // Add Avatar Column
                     if (!dgvUsers.Columns.Contains("Avatar"))
@@ -265,30 +281,16 @@ namespace StudentManagement.Forms
                         dgvUsers.Columns.Insert(0, avatarCol);
                     }
 
-                    // Add Toggle Column for Status
-                    if (!dgvUsers.Columns.Contains("Toggle"))
-                    {
-                        DataGridViewButtonColumn toggleCol = new DataGridViewButtonColumn
-                        {
-                            Name = "Toggle",
-                            HeaderText = "KÍCH HOẠT",
-                            Text = "Toggle",
-                            UseColumnTextForButtonValue = false,
-                            Width = 100
-                        };
-                        dgvUsers.Columns.Add(toggleCol);
-                    }
-
                     // Add Action Buttons
                     if (!dgvUsers.Columns.Contains("Edit"))
                     {
                         DataGridViewButtonColumn editCol = new DataGridViewButtonColumn
                         {
                             Name = "Edit",
-                            HeaderText = "HÀNH ĐỘNG",
+                            HeaderText = "SỬA",
                             Text = "✏️",
                             UseColumnTextForButtonValue = true,
-                            Width = 60
+                            Width = 80
                         };
                         dgvUsers.Columns.Add(editCol);
                     }
@@ -298,10 +300,10 @@ namespace StudentManagement.Forms
                         DataGridViewButtonColumn deleteCol = new DataGridViewButtonColumn
                         {
                             Name = "Delete",
-                            HeaderText = "",
+                            HeaderText = "XÓA",
                             Text = "🗑️",
                             UseColumnTextForButtonValue = true,
-                            Width = 60
+                            Width = 80
                         };
                         dgvUsers.Columns.Add(deleteCol);
                     }
@@ -315,7 +317,6 @@ namespace StudentManagement.Forms
                             row.Cells["TRẠNG THÁI"].Style.ForeColor = Color.FromArgb(16, 185, 129);
                             row.Cells["Toggle"].Style.BackColor = Color.FromArgb(79, 70, 229);
                             row.Cells["Toggle"].Style.ForeColor = Color.White;
-                            row.Cells["Toggle"].Value = "ON";
                         }
                         else
                         {
@@ -323,7 +324,6 @@ namespace StudentManagement.Forms
                             row.Cells["TRẠNG THÁI"].Style.ForeColor = Color.FromArgb(220, 38, 38);
                             row.Cells["Toggle"].Style.BackColor = Color.FromArgb(209, 213, 219);
                             row.Cells["Toggle"].Style.ForeColor = Color.FromArgb(107, 114, 128);
-                            row.Cells["Toggle"].Value = "OFF";
                         }
 
                         string role = row.Cells["VAI TRÒ"].Value.ToString();
@@ -343,8 +343,13 @@ namespace StudentManagement.Forms
                             row.Cells["VAI TRÒ"].Style.ForeColor = Color.FromArgb(245, 158, 11);
                         }
                     }
+
+                    // Refresh to trigger cell painting
+                    dgvUsers.Refresh();
                 }
 
+                // Remove old event handler before adding new one to prevent multiple firings
+                dgvUsers.CellClick -= DgvUsers_CellClick;
                 dgvUsers.CellClick += DgvUsers_CellClick;
             }
             catch (Exception ex)
@@ -389,10 +394,27 @@ namespace StudentManagement.Forms
                 };
 
                 DatabaseHelper.ExecuteNonQuery(query, parameters);
-                LoadUsers();
 
-                MessageBox.Show($"Đã {(newStatus ? "kích hoạt" : "khóa")} tài khoản thành công!", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                // Update the cell value directly without reloading entire grid
+                dgvUsers.Rows[rowIndex].Cells["IsActive"].Value = newStatus;
+                dgvUsers.Rows[rowIndex].Cells["TRẠNG THÁI"].Value = newStatus ? "Hoạt động" : "Khóa";
+                dgvUsers.Rows[rowIndex].Cells["Toggle"].Value = newStatus ? "ON" : "OFF";
+
+                // Update cell styles
+                if (newStatus)
+                {
+                    dgvUsers.Rows[rowIndex].Cells["TRẠNG THÁI"].Style.BackColor = Color.FromArgb(209, 250, 229);
+                    dgvUsers.Rows[rowIndex].Cells["TRẠNG THÁI"].Style.ForeColor = Color.FromArgb(16, 185, 129);
+                    dgvUsers.Rows[rowIndex].Cells["Toggle"].Style.BackColor = Color.FromArgb(79, 70, 229);
+                    dgvUsers.Rows[rowIndex].Cells["Toggle"].Style.ForeColor = Color.White;
+                }
+                else
+                {
+                    dgvUsers.Rows[rowIndex].Cells["TRẠNG THÁI"].Style.BackColor = Color.FromArgb(254, 226, 226);
+                    dgvUsers.Rows[rowIndex].Cells["TRẠNG THÁI"].Style.ForeColor = Color.FromArgb(220, 38, 38);
+                    dgvUsers.Rows[rowIndex].Cells["Toggle"].Style.BackColor = Color.FromArgb(209, 213, 219);
+                    dgvUsers.Rows[rowIndex].Cells["Toggle"].Style.ForeColor = Color.FromArgb(107, 114, 128);
+                }
             }
             catch (Exception ex)
             {
@@ -503,6 +525,44 @@ namespace StudentManagement.Forms
             catch (Exception ex)
             {
                 MessageBox.Show("Lỗi khi lọc: " + ex.Message);
+            }
+        }
+
+        private void UserManagementForm_Resize(object sender, EventArgs e)
+        {
+            try
+            {
+                if (dgvUsers != null && dgvUsers.DataSource != null && this.ClientSize.Width > 0 && this.ClientSize.Height > 0)
+                {
+                    // Adjust DataGridView size based on form size
+                    int newWidth = this.ClientSize.Width - 60; // 30px padding on each side
+                    int newHeight = this.ClientSize.Height - 280; // Header + filters height
+
+                    dgvUsers.Size = new Size(newWidth, newHeight);
+
+                    // Recalculate column widths proportionally
+                    if (dgvUsers.Columns.Count > 0)
+                    {
+                        // Total width available for data columns (excluding fixed-width columns)
+                        int availableWidth = newWidth - 60 - 120 - 80 - 80; // Avatar + Toggle + Edit + Delete
+
+                        // Set column widths proportionally
+                        if (dgvUsers.Columns.Contains("TÊN NGƯỜI DÙNG") && dgvUsers.Columns["TÊN NGƯỜI DÙNG"] != null)
+                            dgvUsers.Columns["TÊN NGƯỜI DÙNG"].Width = (int)(availableWidth * 0.18);
+                        if (dgvUsers.Columns.Contains("EMAIL") && dgvUsers.Columns["EMAIL"] != null)
+                            dgvUsers.Columns["EMAIL"].Width = (int)(availableWidth * 0.25);
+                        if (dgvUsers.Columns.Contains("VAI TRÒ") && dgvUsers.Columns["VAI TRÒ"] != null)
+                            dgvUsers.Columns["VAI TRÒ"].Width = (int)(availableWidth * 0.15);
+                        if (dgvUsers.Columns.Contains("ĐĂNG NHẬP GẦN NHẤT") && dgvUsers.Columns["ĐĂNG NHẬP GẦN NHẤT"] != null)
+                            dgvUsers.Columns["ĐĂNG NHẬP GẦN NHẤT"].Width = (int)(availableWidth * 0.22);
+                        if (dgvUsers.Columns.Contains("TRẠNG THÁI") && dgvUsers.Columns["TRẠNG THÁI"] != null)
+                            dgvUsers.Columns["TRẠNG THÁI"].Width = (int)(availableWidth * 0.20);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // Ignore resize errors during form initialization
             }
         }
     }

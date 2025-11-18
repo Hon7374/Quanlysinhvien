@@ -186,6 +186,7 @@ Số điện thoại: {SessionManager.CurrentUser.Phone}";
                 {
                     Location = new Point(20, 480),
                     Size = new Size(900, 150),
+                    Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right,
                     ReadOnly = true,
                     AllowUserToAddRows = false,
                     SelectionMode = DataGridViewSelectionMode.FullRowSelect,
@@ -268,11 +269,13 @@ Số điện thoại: {SessionManager.CurrentUser.Phone}";
             DataGridView dgv = new DataGridView
             {
                 Location = new Point(20, 80),
-                Size = new Size(900, 500),
+                Size = new Size(panelContent.Width - 60, panelContent.Height - 120),
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
                 ReadOnly = true,
                 AllowUserToAddRows = false,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-                BackgroundColor = Color.White
+                BackgroundColor = Color.White,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
             };
 
             try
@@ -354,11 +357,13 @@ Số điện thoại: {SessionManager.CurrentUser.Phone}";
             DataGridView dgv = new DataGridView
             {
                 Location = new Point(20, 120),
-                Size = new Size(900, 450),
+                Size = new Size(panelContent.Width - 60, panelContent.Height - 160),
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
                 ReadOnly = true,
                 AllowUserToAddRows = false,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
                 BackgroundColor = Color.White,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
                 Name = "dgvStudents"
             };
             panelContent.Controls.Add(dgv);
@@ -374,6 +379,11 @@ Số điện thoại: {SessionManager.CurrentUser.Phone}";
             if (cboCourse.Items.Count > 0)
             {
                 cboCourse.SelectedIndex = 0;
+                // Manually trigger load for first item
+                if (cboCourse.SelectedValue != null)
+                {
+                    LoadStudentsByCourse(dgv, Convert.ToInt32(cboCourse.SelectedValue));
+                }
             }
         }
 
@@ -413,17 +423,38 @@ Số điện thoại: {SessionManager.CurrentUser.Phone}";
 
         private void LoadGradeEntry()
         {
-            MessageBox.Show("Chức năng nhập điểm đang được phát triển!");
+            panelContent.Controls.Clear();
+
+            GradeEntryForm gradeForm = new GradeEntryForm();
+            gradeForm.TopLevel = false;
+            gradeForm.FormBorderStyle = FormBorderStyle.None;
+            gradeForm.Dock = DockStyle.Fill;
+            panelContent.Controls.Add(gradeForm);
+            gradeForm.Show();
         }
 
         private void LoadGradeView()
         {
-            MessageBox.Show("Chức năng xem điểm đang được phát triển!");
+            panelContent.Controls.Clear();
+
+            GradeViewForm gradeViewForm = new GradeViewForm();
+            gradeViewForm.TopLevel = false;
+            gradeViewForm.FormBorderStyle = FormBorderStyle.None;
+            gradeViewForm.Dock = DockStyle.Fill;
+            panelContent.Controls.Add(gradeViewForm);
+            gradeViewForm.Show();
         }
 
         private void LoadProfile()
         {
-            MessageBox.Show("Chức năng thông tin cá nhân đang được phát triển!");
+            panelContent.Controls.Clear();
+
+            TeacherProfileForm profileForm = new TeacherProfileForm();
+            profileForm.TopLevel = false;
+            profileForm.FormBorderStyle = FormBorderStyle.None;
+            profileForm.Dock = DockStyle.Fill;
+            panelContent.Controls.Add(profileForm);
+            profileForm.Show();
         }
 
         private void Logout()

@@ -18,6 +18,7 @@ namespace StudentManagement.Forms
         {
             InitializeComponent();
             LoadSemesters();
+            this.Resize += SemesterManagementForm_Resize;
         }
 
         private void InitializeComponent()
@@ -277,12 +278,12 @@ namespace StudentManagement.Forms
         private void InsertSampleSemesters()
         {
             string insertQuery = @"
-            INSERT INTO Semesters (SemesterName, SemesterCode, StartDate, EndDate, Status) VALUES
-            (N'Học kỳ 1 (2023-2024)', 'HK1_2324', '2023-09-04', '2024-01-12', N'Hoạt động'),
-            (N'Học kỳ 2 (2023-2024)', 'HK2_2324', '2024-01-22', '2024-05-24', N'Hoạt động'),
-            (N'Học kỳ hè (2024)', 'HKH_24', '2024-06-03', '2024-07-26', N'Đã kết thúc'),
-            (N'Học kỳ 1 (2024-2025)', 'HK1_2425', '2024-09-02', '2025-01-10', N'Sắp tới'),
-            (N'Học kỳ 2 (2024-2025)', 'HK2_2425', '2025-01-20', '2025-05-23', N'Sắp tới')";
+            INSERT INTO Semesters (SemesterName, SemesterCode, AcademicYear, StartDate, EndDate, Status) VALUES
+            (N'Học kỳ 1 (2023-2024)', 'HK1_2324', 2023, '2023-09-04', '2024-01-12', N'Hoạt động'),
+            (N'Học kỳ 2 (2023-2024)', 'HK2_2324', 2024, '2024-01-22', '2024-05-24', N'Hoạt động'),
+            (N'Học kỳ hè (2024)', 'HKH_24', 2024, '2024-06-03', '2024-07-26', N'Đã kết thúc'),
+            (N'Học kỳ 1 (2024-2025)', 'HK1_2425', 2024, '2024-09-02', '2025-01-10', N'Sắp tới'),
+            (N'Học kỳ 2 (2024-2025)', 'HK2_2425', 2025, '2025-01-20', '2025-05-23', N'Sắp tới')";
 
             DatabaseHelper.ExecuteNonQuery(insertQuery);
         }
@@ -440,6 +441,42 @@ namespace StudentManagement.Forms
             {
                 MessageBox.Show($"Lỗi khi tìm kiếm: {ex.Message}", "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void SemesterManagementForm_Resize(object sender, EventArgs e)
+        {
+            try
+            {
+                if (this.IsHandleCreated && dgvSemesters != null && dgvSemesters.IsHandleCreated && dgvSemesters.DataSource != null && this.ClientSize.Width > 0 && this.ClientSize.Height > 0)
+                {
+                    // Adjust DataGridView size based on form size
+                    int newWidth = this.ClientSize.Width - 60; // 30px padding on each side
+                    int newHeight = this.ClientSize.Height - 320; // Header + search + padding height
+
+                    dgvSemesters.Size = new Size(newWidth, newHeight);
+
+                    // Recalculate column widths proportionally
+                    if (dgvSemesters.Columns.Count > 0)
+                    {
+                        // Total width available for data columns (excluding fixed-width columns)
+                        int availableWidth = newWidth - 150 - 80 - 80; // StatusBadge + Edit + Delete
+
+                        // Set column widths proportionally
+                        if (dgvSemesters.Columns.Contains("Tên học kỳ") && dgvSemesters.Columns["Tên học kỳ"] != null)
+                            dgvSemesters.Columns["Tên học kỳ"].Width = (int)(availableWidth * 0.35);
+                        if (dgvSemesters.Columns.Contains("Mã học kỳ") && dgvSemesters.Columns["Mã học kỳ"] != null)
+                            dgvSemesters.Columns["Mã học kỳ"].Width = (int)(availableWidth * 0.20);
+                        if (dgvSemesters.Columns.Contains("Ngày bắt đầu") && dgvSemesters.Columns["Ngày bắt đầu"] != null)
+                            dgvSemesters.Columns["Ngày bắt đầu"].Width = (int)(availableWidth * 0.22);
+                        if (dgvSemesters.Columns.Contains("Ngày kết thúc") && dgvSemesters.Columns["Ngày kết thúc"] != null)
+                            dgvSemesters.Columns["Ngày kết thúc"].Width = (int)(availableWidth * 0.23);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // Ignore resize errors during form initialization
             }
         }
     }

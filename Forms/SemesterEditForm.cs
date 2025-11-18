@@ -12,6 +12,7 @@ namespace StudentManagement.Forms
         private int semesterId;
         private TextBox txtSemesterName;
         private TextBox txtSemesterCode;
+        private NumericUpDown nudAcademicYear;
         private DateTimePicker dtpStartDate;
         private DateTimePicker dtpEndDate;
         private ComboBox cmbStatus;
@@ -95,6 +96,21 @@ namespace StudentManagement.Forms
                 BorderStyle = BorderStyle.FixedSingle
             };
             mainPanel.Controls.Add(txtSemesterCode);
+
+            yPos += 75;
+
+            // Academic Year
+            AddLabel(mainPanel, "Năm Học *", 30, yPos);
+            nudAcademicYear = new NumericUpDown
+            {
+                Font = new Font("Segoe UI", 10),
+                Location = new Point(30, yPos + 25),
+                Size = new Size(300, 30),
+                Minimum = 2020,
+                Maximum = 2050,
+                Value = DateTime.Now.Year
+            };
+            mainPanel.Controls.Add(nudAcademicYear);
 
             yPos += 75;
 
@@ -215,7 +231,7 @@ namespace StudentManagement.Forms
         {
             try
             {
-                string query = @"SELECT SemesterName, SemesterCode, StartDate, EndDate,
+                string query = @"SELECT SemesterName, SemesterCode, AcademicYear, StartDate, EndDate,
                                 Status, CreatedAt FROM Semesters WHERE SemesterId = @SemesterId";
 
                 DataTable dt = DatabaseHelper.ExecuteQuery(query,
@@ -226,6 +242,10 @@ namespace StudentManagement.Forms
                     DataRow row = dt.Rows[0];
                     txtSemesterName.Text = row["SemesterName"].ToString();
                     txtSemesterCode.Text = row["SemesterCode"].ToString();
+
+                    if (row["AcademicYear"] != DBNull.Value)
+                        nudAcademicYear.Value = Convert.ToInt32(row["AcademicYear"]);
+
                     dtpStartDate.Value = Convert.ToDateTime(row["StartDate"]);
                     dtpEndDate.Value = Convert.ToDateTime(row["EndDate"]);
 
@@ -304,6 +324,7 @@ namespace StudentManagement.Forms
                 string updateQuery = @"UPDATE Semesters SET
                     SemesterName = @SemesterName,
                     SemesterCode = @SemesterCode,
+                    AcademicYear = @AcademicYear,
                     StartDate = @StartDate,
                     EndDate = @EndDate,
                     Status = @Status
@@ -313,6 +334,7 @@ namespace StudentManagement.Forms
                 {
                     new SqlParameter("@SemesterName", txtSemesterName.Text.Trim()),
                     new SqlParameter("@SemesterCode", txtSemesterCode.Text.Trim()),
+                    new SqlParameter("@AcademicYear", (int)nudAcademicYear.Value),
                     new SqlParameter("@StartDate", dtpStartDate.Value.Date),
                     new SqlParameter("@EndDate", dtpEndDate.Value.Date),
                     new SqlParameter("@Status", cmbStatus.SelectedItem.ToString()),

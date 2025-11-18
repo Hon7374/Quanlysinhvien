@@ -20,7 +20,7 @@ namespace StudentManagement.Forms
         private void InitializeComponent()
         {
             this.Text = "Đăng nhập - Hệ thống Quản lý Sinh viên";
-            this.Size = new Size(450, 350);
+            this.Size = new Size(450, 430);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.BackColor = Color.FromArgb(240, 240, 240);
@@ -111,6 +111,16 @@ namespace StudentManagement.Forms
             btnCancel.FlatAppearance.BorderSize = 0;
             btnCancel.Click += BtnCancel_Click;
 
+            // Create test account link
+            LinkLabel linkCreateTest = new LinkLabel
+            {
+                Text = "Tạo tài khoản test",
+                Location = new Point(50, 305),
+                AutoSize = true,
+                Font = new Font("Segoe UI", 8)
+            };
+            linkCreateTest.LinkClicked += (s, e) => CreateTestAccounts();
+
             // Add controls
             this.Controls.Add(lblTitle);
             this.Controls.Add(lblUsername);
@@ -120,6 +130,7 @@ namespace StudentManagement.Forms
             this.Controls.Add(chkRememberMe);
             this.Controls.Add(btnLogin);
             this.Controls.Add(btnCancel);
+            this.Controls.Add(linkCreateTest);
 
             // Set Enter key to login
             this.AcceptButton = btnLogin;
@@ -214,26 +225,61 @@ namespace StudentManagement.Forms
 
         private void LoadStudentInfo(int userId)
         {
-            string query = "SELECT * FROM Students WHERE UserId = @UserId";
-            SqlParameter[] parameters = { new SqlParameter("@UserId", userId) };
-            DataTable dt = DatabaseHelper.ExecuteQuery(query, parameters);
-
-            if (dt.Rows.Count > 0)
+            try
             {
-                DataRow row = dt.Rows[0];
-                SessionManager.CurrentStudent = new Student
+                string query = "SELECT * FROM Students WHERE UserId = @UserId";
+                SqlParameter[] parameters = { new SqlParameter("@UserId", userId) };
+                DataTable dt = DatabaseHelper.ExecuteQuery(query, parameters);
+
+                if (dt.Rows.Count > 0)
                 {
-                    StudentId = Convert.ToInt32(row["StudentId"]),
-                    UserId = userId,
-                    StudentCode = row["StudentCode"].ToString(),
-                    DateOfBirth = row["DateOfBirth"] != DBNull.Value ? Convert.ToDateTime(row["DateOfBirth"]) : DateTime.MinValue,
-                    Gender = row["Gender"].ToString(),
-                    Address = row["Address"].ToString(),
-                    Class = row["Class"].ToString(),
-                    Major = row["Major"].ToString(),
-                    AcademicYear = row["AcademicYear"] != DBNull.Value ? Convert.ToInt32(row["AcademicYear"]) : 0,
-                    GPA = row["GPA"] != DBNull.Value ? Convert.ToDecimal(row["GPA"]) : 0
-                };
+                    DataRow row = dt.Rows[0];
+                    SessionManager.CurrentStudent = new Student
+                    {
+                        StudentId = Convert.ToInt32(row["StudentId"]),
+                        UserId = userId,
+                        StudentCode = row["StudentCode"].ToString(),
+                        DateOfBirth = row["DateOfBirth"] != DBNull.Value ? Convert.ToDateTime(row["DateOfBirth"]) : DateTime.MinValue,
+                        Gender = row["Gender"] != DBNull.Value ? row["Gender"].ToString() : "",
+                        Address = row["Address"] != DBNull.Value ? row["Address"].ToString() : "",
+                        Class = row["Class"] != DBNull.Value ? row["Class"].ToString() : "",
+                        Major = row["Major"] != DBNull.Value ? row["Major"].ToString() : "",
+                        AcademicYear = row["AcademicYear"] != DBNull.Value ? Convert.ToInt32(row["AcademicYear"]) : DateTime.Now.Year,
+                        GPA = row["GPA"] != DBNull.Value ? Convert.ToDecimal(row["GPA"]) : 0
+                    };
+                }
+                else
+                {
+                    // Create a new student record if it doesn't exist
+                    string studentCode = "SV" + userId.ToString("D6");
+                    string insertQuery = @"INSERT INTO Students (UserId, StudentCode, Class, Major, AcademicYear, Status)
+                                         VALUES (@UserId, @StudentCode, N'Chưa xác định', N'Chưa xác định', @Year, N'Đang học');
+                                         SELECT CAST(SCOPE_IDENTITY() as int)";
+
+                    SqlParameter[] insertParams = {
+                        new SqlParameter("@UserId", userId),
+                        new SqlParameter("@StudentCode", studentCode),
+                        new SqlParameter("@Year", DateTime.Now.Year)
+                    };
+
+                    int newStudentId = Convert.ToInt32(DatabaseHelper.ExecuteScalar(insertQuery, insertParams));
+
+                    SessionManager.CurrentStudent = new Student
+                    {
+                        StudentId = newStudentId,
+                        UserId = userId,
+                        StudentCode = studentCode,
+                        Class = "Chưa xác định",
+                        Major = "Chưa xác định",
+                        AcademicYear = DateTime.Now.Year,
+                        GPA = 0
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi khi tải thông tin sinh viên: {ex.Message}", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -263,6 +309,43 @@ namespace StudentManagement.Forms
         {
             this.DialogResult = DialogResult.Cancel;
             this.Close();
+        }
+
+        private void CreateTestAccounts()
+        {
+            try
+            {
+                // Create student01
+                string checkUser = "SELECT COUNT(*) FROM Users WHERE Username = 'student01'";
+                int userExists = Convert.ToInt32(DatabaseHelper.ExecuteScalar(checkUser));
+
+                if (userExists == 0)
+                {
+                    string insertUser = @"INSERT INTO Users (Username, Password, FullName, Email, Phone, Role, IsActive)
+                                        VALUES ('student01', 'student123', N'Nguyễn Văn A', 'student01@example.com', '0901234567', 3, 1);
+                                        SELECT CAST(SCOPE_IDENTITY() as int)";
+                    int userId = Convert.ToInt32(DatabaseHelper.ExecuteScalar(insertUser));
+
+                    string insertStudent = @"INSERT INTO Students (UserId, StudentCode, Class, Major, AcademicYear, Status)
+                                           VALUES (@UserId, 'SV2024001', N'CNTT-K18', N'Công nghệ thông tin', 2024, N'Đang học')";
+                    DatabaseHelper.ExecuteNonQuery(insertStudent, new SqlParameter[] { new SqlParameter("@UserId", userId) });
+
+                    MessageBox.Show("Đã tạo tài khoản test:\n\nUsername: student01\nPassword: student123\nRole: Sinh viên",
+                        "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    // Update password
+                    DatabaseHelper.ExecuteNonQuery("UPDATE Users SET Password = 'student123', IsActive = 1 WHERE Username = 'student01'");
+                    MessageBox.Show("Tài khoản student01 đã tồn tại.\nĐã cập nhật mật khẩu thành: student123",
+                        "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi khi tạo tài khoản test: {ex.Message}", "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

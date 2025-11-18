@@ -10,6 +10,7 @@ namespace StudentManagement.Forms
     {
         private TextBox txtSemesterName;
         private TextBox txtSemesterCode;
+        private NumericUpDown nudAcademicYear;
         private DateTimePicker dtpStartDate;
         private DateTimePicker dtpEndDate;
         private ComboBox cmbStatus;
@@ -22,7 +23,7 @@ namespace StudentManagement.Forms
         private void InitializeComponent()
         {
             this.Text = "Thêm Học kỳ Mới - Add New Semester";
-            this.Size = new Size(600, 520);
+            this.Size = new Size(600, 600);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -73,6 +74,21 @@ namespace StudentManagement.Forms
                 BorderStyle = BorderStyle.FixedSingle
             };
             mainPanel.Controls.Add(txtSemesterCode);
+
+            yPos += 75;
+
+            // Academic Year
+            AddLabel(mainPanel, "Năm Học *", 30, yPos);
+            nudAcademicYear = new NumericUpDown
+            {
+                Font = new Font("Segoe UI", 10),
+                Location = new Point(30, yPos + 25),
+                Size = new Size(250, 30),
+                Minimum = 2020,
+                Maximum = 2050,
+                Value = DateTime.Now.Year
+            };
+            mainPanel.Controls.Add(nudAcademicYear);
 
             yPos += 75;
 
@@ -218,13 +234,14 @@ namespace StudentManagement.Forms
 
                 // Insert semester
                 string insertQuery = @"INSERT INTO Semesters
-                    (SemesterName, SemesterCode, StartDate, EndDate, Status)
-                    VALUES (@SemesterName, @SemesterCode, @StartDate, @EndDate, @Status)";
+                    (SemesterName, SemesterCode, AcademicYear, StartDate, EndDate, Status)
+                    VALUES (@SemesterName, @SemesterCode, @AcademicYear, @StartDate, @EndDate, @Status)";
 
                 SqlParameter[] parameters = new SqlParameter[]
                 {
                     new SqlParameter("@SemesterName", txtSemesterName.Text.Trim()),
                     new SqlParameter("@SemesterCode", txtSemesterCode.Text.Trim()),
+                    new SqlParameter("@AcademicYear", (int)nudAcademicYear.Value),
                     new SqlParameter("@StartDate", dtpStartDate.Value.Date),
                     new SqlParameter("@EndDate", dtpEndDate.Value.Date),
                     new SqlParameter("@Status", cmbStatus.SelectedItem.ToString())

@@ -180,6 +180,7 @@ Số điện thoại: {SessionManager.CurrentUser.Phone}
                 {
                     Location = new Point(20, 510),
                     Size = new Size(900, 130),
+                    Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right,
                     ReadOnly = true,
                     AllowUserToAddRows = false,
                     SelectionMode = DataGridViewSelectionMode.FullRowSelect,
@@ -264,11 +265,13 @@ Số điện thoại: {SessionManager.CurrentUser.Phone}
             DataGridView dgv = new DataGridView
             {
                 Location = new Point(20, 80),
-                Size = new Size(900, 500),
+                Size = new Size(panelContent.Width - 60, panelContent.Height - 120),
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
                 ReadOnly = true,
                 AllowUserToAddRows = false,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-                BackgroundColor = Color.White
+                BackgroundColor = Color.White,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
             };
 
             string query = @"SELECT c.CourseCode, c.CourseName, c.Credits,
@@ -305,60 +308,139 @@ Số điện thoại: {SessionManager.CurrentUser.Phone}
 
             Label lblTitle = new Label
             {
-                Text = "XEM ĐIỂM",
+                Text = "BẢNG ĐIỂM CỦA TÔI",
                 Font = new Font("Segoe UI", 18, FontStyle.Bold),
                 Location = new Point(20, 20),
-                AutoSize = true
+                AutoSize = true,
+                ForeColor = Color.FromArgb(52, 152, 219)
             };
             panelContent.Controls.Add(lblTitle);
 
+            // Statistics Panel
+            Panel statsPanel = new Panel
+            {
+                Location = new Point(20, 70),
+                Size = new Size(900, 80),
+                BackColor = Color.White,
+                BorderStyle = BorderStyle.FixedSingle
+            };
+
+            try
+            {
+                int studentId = SessionManager.CurrentStudent.StudentId;
+
+                // Calculate statistics
+                string statsQuery = @"SELECT
+                    COUNT(CASE WHEN g.TotalScore IS NOT NULL THEN 1 END) as GradedCourses,
+                    COUNT(CASE WHEN g.TotalScore >= 5.0 THEN 1 END) as PassedCourses,
+                    AVG(CASE WHEN g.TotalScore IS NOT NULL THEN g.TotalScore END) as AvgScore
+                    FROM Enrollments e
+                    LEFT JOIN Grades g ON e.EnrollmentId = g.EnrollmentId
+                    WHERE e.StudentId = @StudentId";
+
+                DataTable statsTable = DatabaseHelper.ExecuteQuery(statsQuery,
+                    new SqlParameter[] { new SqlParameter("@StudentId", studentId) });
+
+                if (statsTable.Rows.Count > 0)
+                {
+                    DataRow statsRow = statsTable.Rows[0];
+                    int gradedCourses = statsRow["GradedCourses"] != DBNull.Value ? Convert.ToInt32(statsRow["GradedCourses"]) : 0;
+                    int passedCourses = statsRow["PassedCourses"] != DBNull.Value ? Convert.ToInt32(statsRow["PassedCourses"]) : 0;
+                    decimal avgScore = statsRow["AvgScore"] != DBNull.Value ? Convert.ToDecimal(statsRow["AvgScore"]) : 0;
+
+                    Label lblStats = new Label
+                    {
+                        Text = $"Tổng môn đã có điểm: {gradedCourses} | Môn đạt: {passedCourses} | Điểm TB: {avgScore:0.00} | GPA: {SessionManager.CurrentStudent.GPA:0.00}",
+                        Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                        Location = new Point(20, 25),
+                        AutoSize = true,
+                        ForeColor = Color.FromArgb(52, 73, 94)
+                    };
+                    statsPanel.Controls.Add(lblStats);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi tải thống kê: " + ex.Message);
+            }
+
+            panelContent.Controls.Add(statsPanel);
+
+            // DataGridView for grades
             DataGridView dgv = new DataGridView
             {
-                Location = new Point(20, 80),
-                Size = new Size(900, 500),
+                Location = new Point(20, 170),
+                Size = new Size(panelContent.Width - 60, panelContent.Height - 210),
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
                 ReadOnly = true,
                 AllowUserToAddRows = false,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-                BackgroundColor = Color.White
+                BackgroundColor = Color.White,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
             };
 
-            string query = @"SELECT c.CourseCode, c.CourseName, c.Credits,
-                            g.MidtermScore, g.FinalScore, g.AssignmentScore,
-                            g.TotalScore, g.LetterGrade, g.Comments
-                            FROM Enrollments e
-                            INNER JOIN Courses c ON e.CourseId = c.CourseId
-                            LEFT JOIN Grades g ON e.EnrollmentId = g.EnrollmentId
-                            WHERE e.StudentId = @StudentId
-                            ORDER BY c.Semester DESC, c.CourseCode";
+            string query = @"SELECT
+                c.CourseCode as 'Mã môn',
+                c.CourseName as 'Tên môn học',
+                c.Credits as 'Tín chỉ',
+                c.Semester as 'Học kỳ',
+                ISNULL(g.MidtermScore, 0) as 'Điểm GK',
+                ISNULL(g.FinalScore, 0) as 'Điểm CK',
+                ISNULL(g.TotalScore, 0) as 'Điểm TB',
+                ISNULL(g.LetterGrade, 'N/A') as 'Xếp loại',
+                CASE
+                    WHEN g.TotalScore >= 5.0 THEN N'Đạt'
+                    WHEN g.TotalScore < 5.0 AND g.TotalScore > 0 THEN N'Không đạt'
+                    ELSE N'Chưa có điểm'
+                END as 'Kết quả'
+                FROM Enrollments e
+                INNER JOIN Courses c ON e.CourseId = c.CourseId
+                LEFT JOIN Grades g ON e.EnrollmentId = g.EnrollmentId
+                WHERE e.StudentId = @StudentId
+                ORDER BY c.Semester DESC, c.CourseCode";
 
             dgv.DataSource = DatabaseHelper.ExecuteQuery(query,
                 new SqlParameter[] { new SqlParameter("@StudentId", SessionManager.CurrentStudent.StudentId) });
 
-            if (dgv.Columns.Count >= 9)
+            // Color code the results
+            dgv.CellFormatting += (s, e) =>
             {
-                dgv.Columns[0].HeaderText = "Mã môn";
-                dgv.Columns[1].HeaderText = "Tên môn học";
-                dgv.Columns[2].HeaderText = "Tín chỉ";
-                dgv.Columns[3].HeaderText = "Điểm GK";
-                dgv.Columns[4].HeaderText = "Điểm CK";
-                dgv.Columns[5].HeaderText = "Điểm BT";
-                dgv.Columns[6].HeaderText = "Tổng điểm";
-                dgv.Columns[7].HeaderText = "Điểm chữ";
-                dgv.Columns[8].HeaderText = "Nhận xét";
-            }
+                if (dgv.Columns[e.ColumnIndex].HeaderText == "Kết quả")
+                {
+                    string value = e.Value?.ToString();
+                    if (value == "Đạt")
+                    {
+                        e.CellStyle.BackColor = Color.FromArgb(46, 204, 113);
+                        e.CellStyle.ForeColor = Color.White;
+                        e.CellStyle.Font = new Font(dgv.Font, FontStyle.Bold);
+                    }
+                    else if (value == "Không đạt")
+                    {
+                        e.CellStyle.BackColor = Color.FromArgb(231, 76, 60);
+                        e.CellStyle.ForeColor = Color.White;
+                        e.CellStyle.Font = new Font(dgv.Font, FontStyle.Bold);
+                    }
+                    else
+                    {
+                        e.CellStyle.BackColor = Color.FromArgb(149, 165, 166);
+                        e.CellStyle.ForeColor = Color.White;
+                    }
+                }
+                else if (dgv.Columns[e.ColumnIndex].HeaderText == "Xếp loại")
+                {
+                    string value = e.Value?.ToString();
+                    if (value == "A")
+                        e.CellStyle.ForeColor = Color.FromArgb(46, 204, 113);
+                    else if (value == "B")
+                        e.CellStyle.ForeColor = Color.FromArgb(52, 152, 219);
+                    else if (value == "C")
+                        e.CellStyle.ForeColor = Color.FromArgb(241, 196, 15);
+                    else if (value == "D" || value == "F")
+                        e.CellStyle.ForeColor = Color.FromArgb(231, 76, 60);
+                }
+            };
 
             panelContent.Controls.Add(dgv);
-
-            // Display GPA
-            Label lblGPA = new Label
-            {
-                Text = $"GPA hiện tại: {SessionManager.CurrentStudent.GPA:0.00}",
-                Font = new Font("Segoe UI", 14, FontStyle.Bold),
-                Location = new Point(20, 590),
-                AutoSize = true,
-                ForeColor = Color.FromArgb(52, 152, 219)
-            };
-            panelContent.Controls.Add(lblGPA);
         }
 
         private void LoadCourseRegistration()
@@ -397,19 +479,22 @@ Số điện thoại: {SessionManager.CurrentUser.Phone}
             DataGridView dgv = new DataGridView
             {
                 Location = new Point(20, 120),
-                Size = new Size(900, 400),
+                Size = new Size(panelContent.Width - 60, panelContent.Height - 180),
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
                 ReadOnly = true,
                 AllowUserToAddRows = false,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-                BackgroundColor = Color.White
+                BackgroundColor = Color.White,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
             };
 
             Button btnRegister = new Button
             {
                 Text = "Đăng ký môn học đã chọn",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Location = new Point(20, 540),
+                Location = new Point(20, panelContent.Height - 60),
                 Size = new Size(200, 40),
+                Anchor = AnchorStyles.Bottom | AnchorStyles.Left,
                 BackColor = Color.FromArgb(46, 204, 113),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
@@ -502,12 +587,26 @@ Số điện thoại: {SessionManager.CurrentUser.Phone}
 
         private void LoadSchedule()
         {
-            MessageBox.Show("Chức năng lịch học đang được phát triển!");
+            panelContent.Controls.Clear();
+
+            ScheduleForm scheduleForm = new ScheduleForm();
+            scheduleForm.TopLevel = false;
+            scheduleForm.FormBorderStyle = FormBorderStyle.None;
+            scheduleForm.Dock = DockStyle.Fill;
+            panelContent.Controls.Add(scheduleForm);
+            scheduleForm.Show();
         }
 
         private void LoadProfile()
         {
-            MessageBox.Show("Chức năng thông tin cá nhân đang được phát triển!");
+            panelContent.Controls.Clear();
+
+            StudentProfileForm profileForm = new StudentProfileForm();
+            profileForm.TopLevel = false;
+            profileForm.FormBorderStyle = FormBorderStyle.None;
+            profileForm.Dock = DockStyle.Fill;
+            panelContent.Controls.Add(profileForm);
+            profileForm.Show();
         }
 
         private void Logout()

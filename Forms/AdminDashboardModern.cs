@@ -130,18 +130,26 @@ namespace StudentManagement.Forms
 
         private void LoadDashboard()
         {
-            panelContent.Controls.Clear();
-
-            // Title
-            Label lblTitle = new Label
+            try
             {
-                Text = "Tổng quan trang thái học tập",
-                Font = new Font("Segoe UI", 20, FontStyle.Bold),
-                Location = new Point(0, 0),
-                AutoSize = true,
-                ForeColor = Color.FromArgb(31, 41, 55)
-            };
-            panelContent.Controls.Add(lblTitle);
+                if (panelContent == null)
+                {
+                    MessageBox.Show("panelContent is null!", "Debug", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                panelContent.Controls.Clear();
+
+                // Title
+                Label lblTitle = new Label
+                {
+                    Text = "Tổng quan trang thái học tập",
+                    Font = new Font("Segoe UI", 20, FontStyle.Bold),
+                    Location = new Point(0, 0),
+                    AutoSize = true,
+                    ForeColor = Color.FromArgb(31, 41, 55)
+                };
+                panelContent.Controls.Add(lblTitle);
 
             // Filters
             Panel panelFilters = new Panel
@@ -222,9 +230,14 @@ namespace StudentManagement.Forms
             try
             {
                 // Get statistics
-                int totalStudents = Convert.ToInt32(DatabaseHelper.ExecuteScalar("SELECT COUNT(*) FROM Students"));
-                int totalCourses = Convert.ToInt32(DatabaseHelper.ExecuteScalar("SELECT COUNT(*) FROM Courses WHERE IsActive = 1"));
-                int totalSubjects = Convert.ToInt32(DatabaseHelper.ExecuteScalar("SELECT COUNT(DISTINCT CourseCode) FROM Courses"));
+                object studentsResult = DatabaseHelper.ExecuteScalar("SELECT COUNT(*) FROM Students");
+                int totalStudents = studentsResult != null && studentsResult != DBNull.Value ? Convert.ToInt32(studentsResult) : 0;
+
+                object coursesResult = DatabaseHelper.ExecuteScalar("SELECT COUNT(*) FROM Courses WHERE IsActive = 1");
+                int totalCourses = coursesResult != null && coursesResult != DBNull.Value ? Convert.ToInt32(coursesResult) : 0;
+
+                object subjectsResult = DatabaseHelper.ExecuteScalar("SELECT COUNT(DISTINCT CourseCode) FROM Courses");
+                int totalSubjects = subjectsResult != null && subjectsResult != DBNull.Value ? Convert.ToInt32(subjectsResult) : 0;
 
                 // Stat Cards Row
                 int cardY = 130;
@@ -301,7 +314,13 @@ namespace StudentManagement.Forms
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi tải dữ liệu: " + ex.Message, "Lỗi",
+                MessageBox.Show("Lỗi khi tải dữ liệu dashboard: " + ex.Message + "\n\nStack Trace: " + ex.StackTrace, "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi nghiêm trọng khi load dashboard: " + ex.Message + "\n\nStack Trace: " + ex.StackTrace, "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -425,8 +444,12 @@ namespace StudentManagement.Forms
             chartPanel.Controls.Add(lblTitle);
 
             // Get real data
-            int enrolled = Convert.ToInt32(DatabaseHelper.ExecuteScalar("SELECT COUNT(*) FROM Enrollments WHERE Status = 'Enrolled'"));
-            int completed = Convert.ToInt32(DatabaseHelper.ExecuteScalar("SELECT COUNT(*) FROM Enrollments WHERE Status = 'Completed'"));
+            object enrolledResult = DatabaseHelper.ExecuteScalar("SELECT COUNT(*) FROM Enrollments WHERE Status = 'Enrolled'");
+            int enrolled = enrolledResult != null && enrolledResult != DBNull.Value ? Convert.ToInt32(enrolledResult) : 0;
+
+            object completedResult = DatabaseHelper.ExecuteScalar("SELECT COUNT(*) FROM Enrollments WHERE Status = 'Completed'");
+            int completed = completedResult != null && completedResult != DBNull.Value ? Convert.ToInt32(completedResult) : 0;
+
             int dropped = 5;
             int total = enrolled + completed + dropped;
 
@@ -504,9 +527,14 @@ namespace StudentManagement.Forms
             chartPanel.Controls.Add(lblTitle);
 
             // Get real data
-            int enrolled = Convert.ToInt32(DatabaseHelper.ExecuteScalar("SELECT COUNT(*) FROM Enrollments WHERE Status = 'Enrolled'"));
-            int completed = Convert.ToInt32(DatabaseHelper.ExecuteScalar("SELECT COUNT(*) FROM Enrollments WHERE Status = 'Completed'"));
-            int dropped = Convert.ToInt32(DatabaseHelper.ExecuteScalar("SELECT COUNT(*) FROM Enrollments WHERE Status = 'Dropped'"));
+            object enrolledResult2 = DatabaseHelper.ExecuteScalar("SELECT COUNT(*) FROM Enrollments WHERE Status = 'Enrolled'");
+            int enrolled = enrolledResult2 != null && enrolledResult2 != DBNull.Value ? Convert.ToInt32(enrolledResult2) : 0;
+
+            object completedResult2 = DatabaseHelper.ExecuteScalar("SELECT COUNT(*) FROM Enrollments WHERE Status = 'Completed'");
+            int completed = completedResult2 != null && completedResult2 != DBNull.Value ? Convert.ToInt32(completedResult2) : 0;
+
+            object droppedResult = DatabaseHelper.ExecuteScalar("SELECT COUNT(*) FROM Enrollments WHERE Status = 'Dropped'");
+            int dropped = droppedResult != null && droppedResult != DBNull.Value ? Convert.ToInt32(droppedResult) : 0;
 
             int maxValue = Math.Max(enrolled, Math.Max(completed, dropped)) + 10;
             if (maxValue == 0) maxValue = 100;
@@ -597,17 +625,64 @@ namespace StudentManagement.Forms
 
         private void LoadStudentManagement()
         {
-            MessageBox.Show("Chức năng Quản lý Sinh viên!");
+            try
+            {
+                panelContent.Controls.Clear();
+
+                // Create and show StudentManagementForm as a child form
+                StudentManagementForm studentForm = new StudentManagementForm();
+                studentForm.TopLevel = false;
+                studentForm.FormBorderStyle = FormBorderStyle.None;
+                studentForm.Dock = DockStyle.Fill;
+                panelContent.Controls.Add(studentForm);
+                studentForm.Show();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi khi tải trang quản lý sinh viên: {ex.Message}\n\nStack Trace: {ex.StackTrace}",
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void LoadTeacherManagement()
         {
-            MessageBox.Show("Chức năng Quản lý Giảng viên!");
+            try
+            {
+                panelContent.Controls.Clear();
+
+                // Create and show TeacherManagementForm as a child form
+                TeacherManagementForm teacherForm = new TeacherManagementForm();
+                teacherForm.TopLevel = false;
+                teacherForm.FormBorderStyle = FormBorderStyle.None;
+                teacherForm.Dock = DockStyle.Fill;
+                panelContent.Controls.Add(teacherForm);
+                teacherForm.Show();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi khi tải trang quản lý giảng viên: {ex.Message}\n\nStack Trace: {ex.StackTrace}",
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void LoadCourseManagement()
         {
-            MessageBox.Show("Chức năng Quản lý Môn học!");
+            try
+            {
+                panelContent.Controls.Clear();
+
+                CourseManagementForm courseForm = new CourseManagementForm();
+                courseForm.TopLevel = false;
+                courseForm.FormBorderStyle = FormBorderStyle.None;
+                courseForm.Dock = DockStyle.Fill;
+                panelContent.Controls.Add(courseForm);
+                courseForm.Show();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi khi tải trang quản lý môn học: {ex.Message}\n\nStack Trace: {ex.StackTrace}",
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void LoadUserManagement()
@@ -625,25 +700,47 @@ namespace StudentManagement.Forms
 
         private void LoadSemesterManagement()
         {
-            panelContent.Controls.Clear();
+            try
+            {
+                panelContent.Controls.Clear();
 
-            // Create and show SemesterManagementForm as a child form
-            SemesterManagementForm semesterForm = new SemesterManagementForm();
-            semesterForm.TopLevel = false;
-            semesterForm.FormBorderStyle = FormBorderStyle.None;
-            semesterForm.Dock = DockStyle.Fill;
-            panelContent.Controls.Add(semesterForm);
-            semesterForm.Show();
+                // Create and show SemesterManagementForm as a child form
+                SemesterManagementForm semesterForm = new SemesterManagementForm();
+                semesterForm.TopLevel = false;
+                semesterForm.FormBorderStyle = FormBorderStyle.None;
+                semesterForm.Dock = DockStyle.Fill;
+                panelContent.Controls.Add(semesterForm);
+                semesterForm.Show();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi khi tải trang quản lý học kỳ: {ex.Message}\n\nStack Trace: {ex.StackTrace}",
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void LoadReports()
         {
-            MessageBox.Show("Chức năng Thống kê và Báo cáo!");
+            panelContent.Controls.Clear();
+
+            ReportsForm reportsForm = new ReportsForm();
+            reportsForm.TopLevel = false;
+            reportsForm.FormBorderStyle = FormBorderStyle.None;
+            reportsForm.Dock = DockStyle.Fill;
+            panelContent.Controls.Add(reportsForm);
+            reportsForm.Show();
         }
 
         private void LoadSettings()
         {
-            MessageBox.Show("Chức năng Cài đặt!");
+            panelContent.Controls.Clear();
+
+            SettingsForm settingsForm = new SettingsForm();
+            settingsForm.TopLevel = false;
+            settingsForm.FormBorderStyle = FormBorderStyle.None;
+            settingsForm.Dock = DockStyle.Fill;
+            panelContent.Controls.Add(settingsForm);
+            settingsForm.Show();
         }
 
         private void Logout()

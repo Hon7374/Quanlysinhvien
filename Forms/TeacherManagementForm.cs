@@ -8,29 +8,29 @@ using StudentManagement.Models;
 
 namespace StudentManagement.Forms
 {
-    public partial class StudentManagementForm : Form
+    public partial class TeacherManagementForm : Form
     {
         private Panel panelHeader;
         private Panel panelFilters;
         private Panel panelContent;
-        private DataGridView dgvStudents;
+        private DataGridView dgvTeachers;
         private TextBox txtSearch;
-        private ComboBox cboClass;
-        private ComboBox cboMajor;
+        private ComboBox cboDepartment;
+        private ComboBox cboDegree;
         private ComboBox cboStatus;
 
-        public StudentManagementForm()
+        public TeacherManagementForm()
         {
             InitializeComponent();
-            CreateStudentsTableIfNotExists();
+            CreateTeachersTableIfNotExists();
             LoadFilters();
-            LoadStudents();
-            this.Resize += StudentManagementForm_Resize;
+            LoadTeachers();
+            this.Resize += TeacherManagementForm_Resize;
         }
 
         private void InitializeComponent()
         {
-            this.Text = "Quản lý Sinh viên - Student Management";
+            this.Text = "Quản lý Giảng viên - Teacher Management";
             this.Size = new Size(1400, 900);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.BackColor = Color.FromArgb(249, 250, 251);
@@ -47,7 +47,7 @@ namespace StudentManagement.Forms
             // Title
             Label lblTitle = new Label
             {
-                Text = "Quản lý sinh viên",
+                Text = "Quản lý giảng viên",
                 Font = new Font("Segoe UI", 20, FontStyle.Bold),
                 Location = new Point(30, 20),
                 AutoSize = true,
@@ -55,10 +55,10 @@ namespace StudentManagement.Forms
             };
             panelHeader.Controls.Add(lblTitle);
 
-            // Add Student Button
-            Button btnAddStudent = new Button
+            // Add Teacher Button
+            Button btnAddTeacher = new Button
             {
-                Text = "+ Thêm sinh viên",
+                Text = "+ Thêm giảng viên",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 Location = new Point(30, 65),
                 Size = new Size(180, 45),
@@ -67,9 +67,9 @@ namespace StudentManagement.Forms
                 FlatStyle = FlatStyle.Flat,
                 Cursor = Cursors.Hand
             };
-            btnAddStudent.FlatAppearance.BorderSize = 0;
-            btnAddStudent.Click += BtnAddStudent_Click;
-            panelHeader.Controls.Add(btnAddStudent);
+            btnAddTeacher.FlatAppearance.BorderSize = 0;
+            btnAddTeacher.Click += BtnAddTeacher_Click;
+            panelHeader.Controls.Add(btnAddTeacher);
 
             // Filters Panel
             panelFilters = new Panel
@@ -105,24 +105,24 @@ namespace StudentManagement.Forms
                 Size = new Size(350, 30),
                 BorderStyle = BorderStyle.None,
                 BackColor = Color.FromArgb(249, 250, 251),
-                PlaceholderText = "Tìm kiếm sinh viên theo MSSV hoặc Họ tên"
+                PlaceholderText = "Tìm kiếm giảng viên theo mã hoặc tên"
             };
             txtSearch.TextChanged += TxtSearch_TextChanged;
             searchBg.Controls.Add(txtSearch);
             panelFilters.Controls.Add(searchBg);
 
-            // Class Filter
-            Label lblClass = new Label
+            // Department Filter
+            Label lblDept = new Label
             {
-                Text = "Tất cả lớp",
+                Text = "Tất cả khoa",
                 Font = new Font("Segoe UI", 9),
                 Location = new Point(450, 5),
                 AutoSize = true,
                 ForeColor = Color.FromArgb(107, 114, 128)
             };
-            panelFilters.Controls.Add(lblClass);
+            panelFilters.Controls.Add(lblDept);
 
-            cboClass = new ComboBox
+            cboDepartment = new ComboBox
             {
                 Font = new Font("Segoe UI", 10),
                 Location = new Point(450, 25),
@@ -130,21 +130,21 @@ namespace StudentManagement.Forms
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 FlatStyle = FlatStyle.Flat
             };
-            cboClass.SelectedIndexChanged += Filter_Changed;
-            panelFilters.Controls.Add(cboClass);
+            cboDepartment.SelectedIndexChanged += Filter_Changed;
+            panelFilters.Controls.Add(cboDepartment);
 
-            // Major Filter
-            Label lblMajor = new Label
+            // Degree Filter
+            Label lblDegree = new Label
             {
-                Text = "Tất cả chuyên ngành",
+                Text = "Tất cả học vị",
                 Font = new Font("Segoe UI", 9),
                 Location = new Point(650, 5),
                 AutoSize = true,
                 ForeColor = Color.FromArgb(107, 114, 128)
             };
-            panelFilters.Controls.Add(lblMajor);
+            panelFilters.Controls.Add(lblDegree);
 
-            cboMajor = new ComboBox
+            cboDegree = new ComboBox
             {
                 Font = new Font("Segoe UI", 10),
                 Location = new Point(650, 25),
@@ -152,8 +152,8 @@ namespace StudentManagement.Forms
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 FlatStyle = FlatStyle.Flat
             };
-            cboMajor.SelectedIndexChanged += Filter_Changed;
-            panelFilters.Controls.Add(cboMajor);
+            cboDegree.SelectedIndexChanged += Filter_Changed;
+            panelFilters.Controls.Add(cboDegree);
 
             // Status Filter
             Label lblStatus = new Label
@@ -174,7 +174,7 @@ namespace StudentManagement.Forms
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 FlatStyle = FlatStyle.Flat
             };
-            cboStatus.Items.AddRange(new object[] { "Tất cả", "Đang học", "Bảo lưu", "Đã tốt nghiệp" });
+            cboStatus.Items.AddRange(new object[] { "Tất cả", "Đang làm việc", "Nghỉ phép", "Đã nghỉ việc" });
             cboStatus.SelectedIndex = 0;
             cboStatus.SelectedIndexChanged += Filter_Changed;
             panelFilters.Controls.Add(cboStatus);
@@ -188,8 +188,8 @@ namespace StudentManagement.Forms
                 AutoScroll = true
             };
 
-            // DataGridView for Students
-            dgvStudents = new DataGridView
+            // DataGridView for Teachers
+            dgvTeachers = new DataGridView
             {
                 Location = new Point(0, 20),
                 Size = new Size(1320, 650),
@@ -221,59 +221,56 @@ namespace StudentManagement.Forms
                 }
             };
 
-            panelContent.Controls.Add(dgvStudents);
+            panelContent.Controls.Add(dgvTeachers);
 
             this.Controls.Add(panelContent);
             this.Controls.Add(panelFilters);
             this.Controls.Add(panelHeader);
         }
 
-        private void CreateStudentsTableIfNotExists()
+        private void CreateTeachersTableIfNotExists()
         {
             try
             {
                 string createTableQuery = @"
-                IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Students')
+                IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Teachers')
                 BEGIN
-                    CREATE TABLE Students (
-                        StudentId INT PRIMARY KEY IDENTITY(1,1),
+                    CREATE TABLE Teachers (
+                        TeacherId INT PRIMARY KEY IDENTITY(1,1),
                         UserId INT FOREIGN KEY REFERENCES Users(UserId),
-                        StudentCode NVARCHAR(50) NOT NULL UNIQUE,
-                        DateOfBirth DATE,
-                        Gender NVARCHAR(10),
-                        Address NVARCHAR(255),
-                        Class NVARCHAR(50),
-                        Major NVARCHAR(100),
-                        AcademicYear INT,
-                        GPA DECIMAL(3,2) DEFAULT 0.00,
-                        Status NVARCHAR(50) DEFAULT N'Đang học',
+                        TeacherCode NVARCHAR(50) NOT NULL UNIQUE,
+                        Department NVARCHAR(100),
+                        Degree NVARCHAR(50),
+                        Specialization NVARCHAR(100),
+                        HireDate DATE,
+                        Status NVARCHAR(50) DEFAULT N'Đang làm việc',
                         CreatedAt DATETIME DEFAULT GETDATE()
                     )
                 END";
 
                 DatabaseHelper.ExecuteNonQuery(createTableQuery);
 
-                // Add Status column if it doesn't exist (for existing tables)
+                // Add Status column if it doesn't exist
                 string addStatusColumn = @"
-                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Students') AND name = 'Status')
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Teachers') AND name = 'Status')
                 BEGIN
-                    ALTER TABLE Students ADD Status NVARCHAR(50) DEFAULT N'Đang học'
+                    ALTER TABLE Teachers ADD Status NVARCHAR(50) DEFAULT N'Đang làm việc'
                 END";
 
                 DatabaseHelper.ExecuteNonQuery(addStatusColumn);
 
-                // Add CreatedAt column if it doesn't exist (for existing tables)
+                // Add CreatedAt column if it doesn't exist
                 string addCreatedAtColumn = @"
-                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Students') AND name = 'CreatedAt')
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Teachers') AND name = 'CreatedAt')
                 BEGIN
-                    ALTER TABLE Students ADD CreatedAt DATETIME DEFAULT GETDATE()
+                    ALTER TABLE Teachers ADD CreatedAt DATETIME DEFAULT GETDATE()
                 END";
 
                 DatabaseHelper.ExecuteNonQuery(addCreatedAtColumn);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi khi tạo bảng Students: {ex.Message}", "Lỗi",
+                MessageBox.Show($"Lỗi khi tạo bảng Teachers: {ex.Message}", "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -282,27 +279,27 @@ namespace StudentManagement.Forms
         {
             try
             {
-                // Load Classes
-                cboClass.Items.Clear();
-                cboClass.Items.Add("Tất cả");
-                string classQuery = "SELECT DISTINCT Class FROM Students WHERE Class IS NOT NULL ORDER BY Class";
-                DataTable dtClass = DatabaseHelper.ExecuteQuery(classQuery);
-                foreach (DataRow row in dtClass.Rows)
+                // Load Departments
+                cboDepartment.Items.Clear();
+                cboDepartment.Items.Add("Tất cả");
+                string deptQuery = "SELECT DISTINCT Department FROM Teachers WHERE Department IS NOT NULL ORDER BY Department";
+                DataTable dtDept = DatabaseHelper.ExecuteQuery(deptQuery);
+                foreach (DataRow row in dtDept.Rows)
                 {
-                    cboClass.Items.Add(row["Class"].ToString());
+                    cboDepartment.Items.Add(row["Department"].ToString());
                 }
-                cboClass.SelectedIndex = 0;
+                cboDepartment.SelectedIndex = 0;
 
-                // Load Majors
-                cboMajor.Items.Clear();
-                cboMajor.Items.Add("Tất cả");
-                string majorQuery = "SELECT DISTINCT Major FROM Students WHERE Major IS NOT NULL ORDER BY Major";
-                DataTable dtMajor = DatabaseHelper.ExecuteQuery(majorQuery);
-                foreach (DataRow row in dtMajor.Rows)
+                // Load Degrees
+                cboDegree.Items.Clear();
+                cboDegree.Items.Add("Tất cả");
+                string degreeQuery = "SELECT DISTINCT Degree FROM Teachers WHERE Degree IS NOT NULL ORDER BY Degree";
+                DataTable dtDegree = DatabaseHelper.ExecuteQuery(degreeQuery);
+                foreach (DataRow row in dtDegree.Rows)
                 {
-                    cboMajor.Items.Add(row["Major"].ToString());
+                    cboDegree.Items.Add(row["Degree"].ToString());
                 }
-                cboMajor.SelectedIndex = 0;
+                cboDegree.SelectedIndex = 0;
             }
             catch (Exception ex)
             {
@@ -311,65 +308,64 @@ namespace StudentManagement.Forms
             }
         }
 
-        private void LoadStudents(string searchText = "", string classFilter = "", string majorFilter = "", string statusFilter = "")
+        private void LoadTeachers(string searchText = "", string deptFilter = "", string degreeFilter = "", string statusFilter = "")
         {
             try
             {
                 string query = @"
                     SELECT
-                        s.StudentId,
-                        s.StudentCode as 'MSSV',
+                        t.TeacherId,
+                        t.TeacherCode as 'Mã GV',
                         u.FullName as 'Họ tên',
-                        s.Class as 'Lớp',
-                        s.Major as 'Chuyên ngành',
+                        t.Department as 'Khoa',
+                        t.Degree as 'Học vị',
+                        t.Specialization as 'Chuyên môn',
                         u.Email as 'Email',
                         u.Phone as 'SĐT',
-                        s.Status as 'Trạng thái',
-                        s.Status as 'StatusValue'
-                    FROM Students s
-                    INNER JOIN Users u ON s.UserId = u.UserId
+                        t.Status as 'StatusValue'
+                    FROM Teachers t
+                    INNER JOIN Users u ON t.UserId = u.UserId
                     WHERE 1=1";
 
                 var parameters = new System.Collections.Generic.List<SqlParameter>();
 
                 if (!string.IsNullOrWhiteSpace(searchText))
                 {
-                    query += " AND (s.StudentCode LIKE @Search OR u.FullName LIKE @Search)";
+                    query += " AND (t.TeacherCode LIKE @Search OR u.FullName LIKE @Search)";
                     parameters.Add(new SqlParameter("@Search", "%" + searchText + "%"));
                 }
 
-                if (!string.IsNullOrWhiteSpace(classFilter) && classFilter != "Tất cả")
+                if (!string.IsNullOrWhiteSpace(deptFilter) && deptFilter != "Tất cả")
                 {
-                    query += " AND s.Class = @Class";
-                    parameters.Add(new SqlParameter("@Class", classFilter));
+                    query += " AND t.Department = @Department";
+                    parameters.Add(new SqlParameter("@Department", deptFilter));
                 }
 
-                if (!string.IsNullOrWhiteSpace(majorFilter) && majorFilter != "Tất cả")
+                if (!string.IsNullOrWhiteSpace(degreeFilter) && degreeFilter != "Tất cả")
                 {
-                    query += " AND s.Major = @Major";
-                    parameters.Add(new SqlParameter("@Major", majorFilter));
+                    query += " AND t.Degree = @Degree";
+                    parameters.Add(new SqlParameter("@Degree", degreeFilter));
                 }
 
                 if (!string.IsNullOrWhiteSpace(statusFilter) && statusFilter != "Tất cả")
                 {
-                    query += " AND s.Status = @Status";
+                    query += " AND t.Status = @Status";
                     parameters.Add(new SqlParameter("@Status", statusFilter));
                 }
 
-                query += " ORDER BY s.StudentCode";
+                query += " ORDER BY t.TeacherCode";
 
                 DataTable dt = DatabaseHelper.ExecuteQuery(query, parameters.ToArray());
-                dgvStudents.DataSource = dt;
+                dgvTeachers.DataSource = dt;
 
-                if (dgvStudents.Columns.Count > 0)
+                if (dgvTeachers.Columns.Count > 0)
                 {
                     // Hide ID columns
-                    dgvStudents.Columns["StudentId"].Visible = false;
-                    dgvStudents.Columns["StatusValue"].Visible = false;
-                    dgvStudents.Columns["Trạng thái"].Visible = false;
+                    dgvTeachers.Columns["TeacherId"].Visible = false;
+                    dgvTeachers.Columns["StatusValue"].Visible = false;
 
                     // Add Status Badge Column
-                    if (!dgvStudents.Columns.Contains("StatusBadge"))
+                    if (!dgvTeachers.Columns.Contains("StatusBadge"))
                     {
                         DataGridViewButtonColumn statusCol = new DataGridViewButtonColumn
                         {
@@ -377,17 +373,17 @@ namespace StudentManagement.Forms
                             HeaderText = "TRẠNG THÁI",
                             UseColumnTextForButtonValue = false,
                             FlatStyle = FlatStyle.Flat,
-                            Width = 120,
-                            MinimumWidth = 120,
+                            Width = 130,
+                            MinimumWidth = 130,
                             AutoSizeMode = DataGridViewAutoSizeColumnMode.None,
                             Frozen = false,
                             Visible = true
                         };
-                        dgvStudents.Columns.Add(statusCol);
+                        dgvTeachers.Columns.Add(statusCol);
                     }
 
                     // Add Action Buttons
-                    if (!dgvStudents.Columns.Contains("View"))
+                    if (!dgvTeachers.Columns.Contains("View"))
                     {
                         DataGridViewButtonColumn viewCol = new DataGridViewButtonColumn
                         {
@@ -402,10 +398,10 @@ namespace StudentManagement.Forms
                             Frozen = false,
                             Visible = true
                         };
-                        dgvStudents.Columns.Add(viewCol);
+                        dgvTeachers.Columns.Add(viewCol);
                     }
 
-                    if (!dgvStudents.Columns.Contains("Edit"))
+                    if (!dgvTeachers.Columns.Contains("Edit"))
                     {
                         DataGridViewButtonColumn editCol = new DataGridViewButtonColumn
                         {
@@ -420,10 +416,10 @@ namespace StudentManagement.Forms
                             Frozen = false,
                             Visible = true
                         };
-                        dgvStudents.Columns.Add(editCol);
+                        dgvTeachers.Columns.Add(editCol);
                     }
 
-                    if (!dgvStudents.Columns.Contains("Delete"))
+                    if (!dgvTeachers.Columns.Contains("Delete"))
                     {
                         DataGridViewButtonColumn deleteCol = new DataGridViewButtonColumn
                         {
@@ -438,50 +434,50 @@ namespace StudentManagement.Forms
                             Frozen = false,
                             Visible = true
                         };
-                        dgvStudents.Columns.Add(deleteCol);
+                        dgvTeachers.Columns.Add(deleteCol);
                     }
 
                     // Set DisplayIndex to position button columns at the end (rightmost)
-                    int totalColumns = dgvStudents.Columns.Count;
-                    if (dgvStudents.Columns.Contains("StatusBadge"))
-                        dgvStudents.Columns["StatusBadge"].DisplayIndex = totalColumns - 4;
-                    if (dgvStudents.Columns.Contains("View"))
-                        dgvStudents.Columns["View"].DisplayIndex = totalColumns - 3;
-                    if (dgvStudents.Columns.Contains("Edit"))
-                        dgvStudents.Columns["Edit"].DisplayIndex = totalColumns - 2;
-                    if (dgvStudents.Columns.Contains("Delete"))
-                        dgvStudents.Columns["Delete"].DisplayIndex = totalColumns - 1;
+                    int totalColumns = dgvTeachers.Columns.Count;
+                    if (dgvTeachers.Columns.Contains("StatusBadge"))
+                        dgvTeachers.Columns["StatusBadge"].DisplayIndex = totalColumns - 4;
+                    if (dgvTeachers.Columns.Contains("View"))
+                        dgvTeachers.Columns["View"].DisplayIndex = totalColumns - 3;
+                    if (dgvTeachers.Columns.Contains("Edit"))
+                        dgvTeachers.Columns["Edit"].DisplayIndex = totalColumns - 2;
+                    if (dgvTeachers.Columns.Contains("Delete"))
+                        dgvTeachers.Columns["Delete"].DisplayIndex = totalColumns - 1;
 
                     // Auto-resize data columns to fill space (exclude button columns)
                     ResizeDataColumns();
                 }
 
                 // Remove old event handlers first to avoid multiple subscriptions
-                dgvStudents.CellClick -= DgvStudents_CellClick;
-                dgvStudents.CellPainting -= DgvStudents_CellPainting;
+                dgvTeachers.CellClick -= DgvTeachers_CellClick;
+                dgvTeachers.CellPainting -= DgvTeachers_CellPainting;
 
                 // Add event handlers
-                dgvStudents.CellClick += DgvStudents_CellClick;
-                dgvStudents.CellPainting += DgvStudents_CellPainting;
+                dgvTeachers.CellClick += DgvTeachers_CellClick;
+                dgvTeachers.CellPainting += DgvTeachers_CellPainting;
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi khi tải danh sách sinh viên: {ex.Message}", "Lỗi",
+                MessageBox.Show($"Lỗi khi tải danh sách giảng viên: {ex.Message}", "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void DgvStudents_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
+        private void DgvTeachers_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
-            if (e.RowIndex >= 0 && e.ColumnIndex >= 0 && dgvStudents.Columns[e.ColumnIndex].Name == "StatusBadge")
+            if (e.RowIndex >= 0 && e.ColumnIndex >= 0 && dgvTeachers.Columns[e.ColumnIndex].Name == "StatusBadge")
             {
                 e.Paint(e.CellBounds, DataGridViewPaintParts.All);
 
-                // Get status value, default to "Đang học" if null or empty
-                string status = dgvStudents.Rows[e.RowIndex].Cells["StatusValue"].Value?.ToString();
+                // Get status value, default to "Đang làm việc" if null or empty
+                string status = dgvTeachers.Rows[e.RowIndex].Cells["StatusValue"].Value?.ToString();
                 if (string.IsNullOrEmpty(status))
                 {
-                    status = "Đang học"; // Default status
+                    status = "Đang làm việc"; // Default status
                 }
 
                 Color bgColor;
@@ -489,38 +485,36 @@ namespace StudentManagement.Forms
 
                 switch (status.Trim())
                 {
-                    case "Đang học":
+                    case "Đang làm việc":
                         bgColor = Color.FromArgb(16, 185, 129);
-                        text = "Đang học";
+                        text = "Đang làm việc";
                         break;
-                    case "Bảo lưu":
-                        bgColor = Color.FromArgb(59, 130, 246);
-                        text = "Bảo lưu";
+                    case "Nghỉ phép":
+                        bgColor = Color.FromArgb(251, 191, 36);
+                        text = "Nghỉ phép";
                         break;
-                    case "Đã tốt nghiệp":
+                    case "Đã nghỉ việc":
                         bgColor = Color.FromArgb(107, 114, 128);
-                        text = "Đã tốt nghiệp";
+                        text = "Đã nghỉ việc";
                         break;
                     default:
                         bgColor = Color.FromArgb(16, 185, 129);
-                        text = "Đang học";
+                        text = "Đang làm việc";
                         break;
                 }
 
                 Rectangle rect = new Rectangle(
                     e.CellBounds.X + 10,
                     e.CellBounds.Y + (e.CellBounds.Height - 28) / 2,
-                    100,
+                    110,
                     28
                 );
 
-                // Draw rounded rectangle background
                 using (Brush brush = new SolidBrush(bgColor))
                 {
                     e.Graphics.FillRectangle(brush, rect);
                 }
 
-                // Draw text
                 TextRenderer.DrawText(e.Graphics, text, new Font("Segoe UI", 8, FontStyle.Bold),
                     rect, Color.White, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
 
@@ -528,93 +522,93 @@ namespace StudentManagement.Forms
             }
         }
 
-        private void DgvStudents_CellClick(object sender, DataGridViewCellEventArgs e)
+        private void DgvTeachers_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0)
             {
-                int studentId = Convert.ToInt32(dgvStudents.Rows[e.RowIndex].Cells["StudentId"].Value);
-                string columnName = dgvStudents.Columns[e.ColumnIndex].Name;
+                int teacherId = Convert.ToInt32(dgvTeachers.Rows[e.RowIndex].Cells["TeacherId"].Value);
+                string columnName = dgvTeachers.Columns[e.ColumnIndex].Name;
 
                 if (columnName == "View")
                 {
-                    ViewStudent(studentId);
+                    ViewTeacher(teacherId);
                 }
                 else if (columnName == "Edit")
                 {
-                    EditStudent(studentId);
+                    EditTeacher(teacherId);
                 }
                 else if (columnName == "Delete")
                 {
-                    DeleteStudent(studentId);
+                    DeleteTeacher(teacherId);
                 }
             }
         }
 
-        private void BtnAddStudent_Click(object sender, EventArgs e)
+        private void BtnAddTeacher_Click(object sender, EventArgs e)
         {
-            StudentCreateForm createForm = new StudentCreateForm();
+            TeacherCreateForm createForm = new TeacherCreateForm();
             if (createForm.ShowDialog() == DialogResult.OK)
             {
                 LoadFilters();
-                LoadStudents();
+                LoadTeachers();
             }
         }
 
-        private void ViewStudent(int studentId)
+        private void ViewTeacher(int teacherId)
         {
-            StudentEditForm viewForm = new StudentEditForm(studentId);
+            TeacherEditForm viewForm = new TeacherEditForm(teacherId);
             viewForm.ShowDialog();
         }
 
-        private void EditStudent(int studentId)
+        private void EditTeacher(int teacherId)
         {
-            StudentEditForm editForm = new StudentEditForm(studentId);
+            TeacherEditForm editForm = new TeacherEditForm(teacherId);
             if (editForm.ShowDialog() == DialogResult.OK)
             {
                 LoadFilters();
-                LoadStudents();
+                LoadTeachers();
             }
         }
 
-        private void DeleteStudent(int studentId)
+        private void DeleteTeacher(int teacherId)
         {
             try
             {
-                string query = @"SELECT u.FullName, s.StudentCode
-                                FROM Students s
-                                INNER JOIN Users u ON s.UserId = u.UserId
-                                WHERE s.StudentId = @StudentId";
+                string query = @"SELECT u.FullName, t.TeacherCode
+                                FROM Teachers t
+                                INNER JOIN Users u ON t.UserId = u.UserId
+                                WHERE t.TeacherId = @TeacherId";
                 DataTable dt = DatabaseHelper.ExecuteQuery(query,
-                    new SqlParameter[] { new SqlParameter("@StudentId", studentId) });
+                    new SqlParameter[] { new SqlParameter("@TeacherId", teacherId) });
 
                 if (dt.Rows.Count > 0)
                 {
-                    string studentName = dt.Rows[0]["FullName"].ToString();
-                    string studentCode = dt.Rows[0]["StudentCode"].ToString();
+                    string teacherName = dt.Rows[0]["FullName"].ToString();
+                    string teacherCode = dt.Rows[0]["TeacherCode"].ToString();
 
                     DialogResult result = MessageBox.Show(
-                        $"Bạn có chắc chắn muốn xóa sinh viên '{studentName}' ({studentCode})?\\n\\nHành động này không thể hoàn tác.",
+                        $"Bạn có chắc chắn muốn xóa giảng viên '{teacherName}' ({teacherCode})?\\n\\nHành động này không thể hoàn tác.",
                         "Xác nhận xóa",
                         MessageBoxButtons.YesNo,
                         MessageBoxIcon.Warning);
 
                     if (result == DialogResult.Yes)
                     {
-                        string deleteQuery = "DELETE FROM Students WHERE StudentId = @StudentId";
+                        string deleteQuery = "DELETE FROM Teachers WHERE TeacherId = @TeacherId";
                         DatabaseHelper.ExecuteNonQuery(deleteQuery,
-                            new SqlParameter[] { new SqlParameter("@StudentId", studentId) });
+                            new SqlParameter[] { new SqlParameter("@TeacherId", teacherId) });
 
-                        MessageBox.Show("Xóa sinh viên thành công!", "Thành công",
+                        MessageBox.Show("Xóa giảng viên thành công!", "Thành công",
                             MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                         LoadFilters();
-                        LoadStudents();
+                        LoadTeachers();
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi khi xóa sinh viên: {ex.Message}", "Lỗi",
+                MessageBox.Show($"Lỗi khi xóa giảng viên: {ex.Message}", "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -632,41 +626,43 @@ namespace StudentManagement.Forms
         private void ApplyFilters()
         {
             string searchText = txtSearch.Text.Trim();
-            string classFilter = cboClass.SelectedItem?.ToString() ?? "Tất cả";
-            string majorFilter = cboMajor.SelectedItem?.ToString() ?? "Tất cả";
+            string deptFilter = cboDepartment.SelectedItem?.ToString() ?? "Tất cả";
+            string degreeFilter = cboDegree.SelectedItem?.ToString() ?? "Tất cả";
             string statusFilter = cboStatus.SelectedItem?.ToString() ?? "Tất cả";
 
-            LoadStudents(searchText, classFilter, majorFilter, statusFilter);
+            LoadTeachers(searchText, deptFilter, degreeFilter, statusFilter);
         }
 
         private void ResizeDataColumns()
         {
-            if (dgvStudents.Columns.Count > 0)
+            if (dgvTeachers.Columns.Count > 0)
             {
                 // Total width available for data columns (excluding fixed-width columns)
-                int availableWidth = dgvStudents.Width - 120 - 60 - 60 - 60 - 20; // StatusBadge + View + Edit + Delete + scrollbar
+                int availableWidth = dgvTeachers.Width - 130 - 60 - 60 - 60 - 20; // StatusBadge + View + Edit + Delete + scrollbar
 
                 // Set column widths proportionally - reduced percentages to fit all columns
-                if (dgvStudents.Columns.Contains("MSSV") && dgvStudents.Columns["MSSV"] != null)
-                    dgvStudents.Columns["MSSV"].Width = (int)(availableWidth * 0.10);
-                if (dgvStudents.Columns.Contains("Họ tên") && dgvStudents.Columns["Họ tên"] != null)
-                    dgvStudents.Columns["Họ tên"].Width = (int)(availableWidth * 0.15);
-                if (dgvStudents.Columns.Contains("Lớp") && dgvStudents.Columns["Lớp"] != null)
-                    dgvStudents.Columns["Lớp"].Width = (int)(availableWidth * 0.10);
-                if (dgvStudents.Columns.Contains("Chuyên ngành") && dgvStudents.Columns["Chuyên ngành"] != null)
-                    dgvStudents.Columns["Chuyên ngành"].Width = (int)(availableWidth * 0.15);
-                if (dgvStudents.Columns.Contains("Email") && dgvStudents.Columns["Email"] != null)
-                    dgvStudents.Columns["Email"].Width = (int)(availableWidth * 0.16);
-                if (dgvStudents.Columns.Contains("SĐT") && dgvStudents.Columns["SĐT"] != null)
-                    dgvStudents.Columns["SĐT"].Width = (int)(availableWidth * 0.10);
+                if (dgvTeachers.Columns.Contains("Mã GV") && dgvTeachers.Columns["Mã GV"] != null)
+                    dgvTeachers.Columns["Mã GV"].Width = (int)(availableWidth * 0.08);
+                if (dgvTeachers.Columns.Contains("Họ tên") && dgvTeachers.Columns["Họ tên"] != null)
+                    dgvTeachers.Columns["Họ tên"].Width = (int)(availableWidth * 0.14);
+                if (dgvTeachers.Columns.Contains("Khoa") && dgvTeachers.Columns["Khoa"] != null)
+                    dgvTeachers.Columns["Khoa"].Width = (int)(availableWidth * 0.16);
+                if (dgvTeachers.Columns.Contains("Học vị") && dgvTeachers.Columns["Học vị"] != null)
+                    dgvTeachers.Columns["Học vị"].Width = (int)(availableWidth * 0.08);
+                if (dgvTeachers.Columns.Contains("Chuyên môn") && dgvTeachers.Columns["Chuyên môn"] != null)
+                    dgvTeachers.Columns["Chuyên môn"].Width = (int)(availableWidth * 0.14);
+                if (dgvTeachers.Columns.Contains("Email") && dgvTeachers.Columns["Email"] != null)
+                    dgvTeachers.Columns["Email"].Width = (int)(availableWidth * 0.16);
+                if (dgvTeachers.Columns.Contains("SĐT") && dgvTeachers.Columns["SĐT"] != null)
+                    dgvTeachers.Columns["SĐT"].Width = (int)(availableWidth * 0.10);
             }
         }
 
-        private void StudentManagementForm_Resize(object sender, EventArgs e)
+        private void TeacherManagementForm_Resize(object sender, EventArgs e)
         {
             try
             {
-                if (this.IsHandleCreated && dgvStudents != null && dgvStudents.IsHandleCreated && dgvStudents.DataSource != null && this.ClientSize.Width > 0 && this.ClientSize.Height > 0)
+                if (this.IsHandleCreated && dgvTeachers != null && dgvTeachers.IsHandleCreated && dgvTeachers.DataSource != null && this.ClientSize.Width > 0 && this.ClientSize.Height > 0)
                 {
                     // Recalculate column widths proportionally
                     ResizeDataColumns();
