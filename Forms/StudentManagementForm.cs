@@ -514,57 +514,57 @@ namespace StudentManagement.Forms
             }
         }
 
-        // === XUẤT & NHẬP EXCEL (ĐÃ SỬA LỖI) ===
-        private void BtnExportExcel_Click(object sender, EventArgs e)
-        {
-            var saveDialog = new SaveFileDialog
+            // === XUẤT & NHẬP EXCEL (ĐÃ SỬA LỖI) ===
+            private void BtnExportExcel_Click(object sender, EventArgs e)
             {
-                Filter = "Excel files (*.xlsx)|*.xlsx",
-                FileName = $"DanhSachSinhVien_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx"
-            };
-
-            if (saveDialog.ShowDialog() == DialogResult.OK)
-            {
-                try
+                var saveDialog = new SaveFileDialog
                 {
-                    using (var workbook = new XLWorkbook())
+                    Filter = "Excel files (*.xlsx)|*.xlsx",
+                    FileName = $"DanhSachSinhVien_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx"
+                };
+
+                if (saveDialog.ShowDialog() == DialogResult.OK)
+                {
+                    try
                     {
-                        var ws = workbook.Worksheets.Add("Danh sách sinh viên");
-
-                        // Header
-                        for (int i = 0; i < dgvStudents.Columns.Count; i++)
+                        using (var workbook = new XLWorkbook())
                         {
-                            if (dgvStudents.Columns[i].Visible)
-                                ws.Cell(1, dgvStudents.Columns[i].DisplayIndex + 1).Value = dgvStudents.Columns[i].HeaderText;
-                        }
-                        ws.Row(1).Style.Font.Bold = true;
-                        ws.Row(1).Style.Fill.BackgroundColor = XLColor.FromArgb(79, 70, 229);
-                        ws.Row(1).Style.Font.FontColor = XLColor.White;
+                            var ws = workbook.Worksheets.Add("Danh sách sinh viên");
 
-                        // Data
-                        for (int i = 0; i < dgvStudents.Rows.Count; i++)
-                        {
-                            for (int j = 0; j < dgvStudents.Columns.Count; j++)
+                            // Header
+                            for (int i = 0; i < dgvStudents.Columns.Count; i++)
                             {
-                                if (dgvStudents.Columns[j].Visible)
+                                if (dgvStudents.Columns[i].Visible)
+                                    ws.Cell(1, dgvStudents.Columns[i].DisplayIndex + 1).Value = dgvStudents.Columns[i].HeaderText;
+                            }
+                            ws.Row(1).Style.Font.Bold = true;
+                            ws.Row(1).Style.Fill.BackgroundColor = XLColor.FromArgb(79, 70, 229);
+                            ws.Row(1).Style.Font.FontColor = XLColor.White;
+
+                            // Data
+                            for (int i = 0; i < dgvStudents.Rows.Count; i++)
+                            {
+                                for (int j = 0; j < dgvStudents.Columns.Count; j++)
                                 {
-                                    var value = dgvStudents.Rows[i].Cells[j].FormattedValue?.ToString() ?? "";
-                                    ws.Cell(i + 2, dgvStudents.Columns[j].DisplayIndex + 1).Value = value;
+                                    if (dgvStudents.Columns[j].Visible)
+                                    {
+                                        var value = dgvStudents.Rows[i].Cells[j].FormattedValue?.ToString() ?? "";
+                                        ws.Cell(i + 2, dgvStudents.Columns[j].DisplayIndex + 1).Value = value;
+                                    }
                                 }
                             }
-                        }
 
-                        ws.Columns().AdjustToContents();
-                        workbook.SaveAs(saveDialog.FileName);
+                            ws.Columns().AdjustToContents();
+                            workbook.SaveAs(saveDialog.FileName);
+                        }
+                        MessageBox.Show("Xuất Excel thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
-                    MessageBox.Show("Xuất Excel thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Lỗi xuất Excel: " + ex.Message);
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Lỗi xuất Excel: " + ex.Message);
+                    }
                 }
             }
-        }
 
         private void BtnImportExcel_Click(object sender, EventArgs e)
         {

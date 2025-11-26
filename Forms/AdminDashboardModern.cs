@@ -1,10 +1,13 @@
-using System;
-using System.Data;
-using System.Data.SqlClient;
-using System.Drawing;
-using System.Windows.Forms;
+using iText.Layout.Properties;
 using StudentManagement.Data;
 using StudentManagement.Helpers;
+using System;
+using System.Data;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Windows.Forms;
+
 
 namespace StudentManagement.Forms
 {
@@ -46,7 +49,7 @@ namespace StudentManagement.Forms
                 Text = "🎓 Academia",
                 Font = new Font("Segoe UI", 14, FontStyle.Bold),
                 ForeColor = Color.FromArgb(79, 70, 229),
-                Location = new Point(20, 20),
+                Location = new System.Drawing.Point(20, 20),
                 AutoSize = true
             };
             panelMenu.Controls.Add(lblBrand);
@@ -71,12 +74,23 @@ namespace StudentManagement.Forms
                 BackColor = Color.White
             };
 
+            // Title
+            Label lblTitle = new Label
+            {
+                Text = "Xin chào, Admin",
+                Font = new Font("Segoe UI", 20, FontStyle.Bold),
+                Location = new Point(30, 20),
+                AutoSize = true,
+                ForeColor = Color.FromArgb(31, 41, 55)
+            };
+            panelHeader.Controls.Add(lblTitle);
+
             lblWelcome = new Label
             {
                 Text = $"👤 Đăng xuất",
                 Font = new Font("Segoe UI", 10),
                 ForeColor = Color.FromArgb(220, 38, 38),
-                Location = new Point(1050, 25),
+                Location = new System.Drawing.Point(1050, 25),
                 AutoSize = true,
                 Cursor = Cursors.Hand
             };
@@ -84,14 +98,14 @@ namespace StudentManagement.Forms
             panelHeader.Controls.Add(lblWelcome);
 
             // Search Box
-            TextBox txtSearch = new TextBox
-            {
-                Font = new Font("Segoe UI", 10),
-                Location = new Point(20, 25),
-                Size = new Size(300, 30),
-                Text = "🔍 Tìm kiếm..."
-            };
-            panelHeader.Controls.Add(txtSearch);
+            //TextBox txtSearch = new TextBox
+            //{
+            //    Font = new Font("Segoe UI", 10),
+            //    Location = new System.Drawing.Point(20, 25),
+            //    Size = new Size(300, 30),
+            //    Text = "🔍 Tìm kiếm..."
+            //};
+            //panelHeader.Controls.Add(txtSearch);
 
             // Content Panel
             panelContent = new Panel
@@ -113,7 +127,7 @@ namespace StudentManagement.Forms
             {
                 Text = text,
                 Font = new Font("Segoe UI", 10),
-                Location = new Point(10, yPos),
+                Location = new System.Drawing.Point(10, yPos),
                 Size = new Size(180, 40),
                 FlatStyle = FlatStyle.Flat,
                 ForeColor = isActive ? Color.FromArgb(79, 70, 229) : Color.FromArgb(107, 114, 128),
@@ -145,7 +159,7 @@ namespace StudentManagement.Forms
                 {
                     Text = "Tổng quan trang thái học tập",
                     Font = new Font("Segoe UI", 20, FontStyle.Bold),
-                    Location = new Point(0, 0),
+                    Location = new System.Drawing.Point(0, 0),
                     AutoSize = true,
                     ForeColor = Color.FromArgb(31, 41, 55)
                 };
@@ -154,16 +168,16 @@ namespace StudentManagement.Forms
             // Filters
             Panel panelFilters = new Panel
             {
-                Location = new Point(0, 50),
+                Location = new System.Drawing.Point(0, 50),
                 Size = new Size(1100, 60),
                 BackColor = Color.Transparent
             };
 
             // Year Filter
-            Label lblYear = new Label { Text = "Năm học", Location = new Point(0, 0), AutoSize = true };
+            Label lblYear = new Label { Text = "Năm học", Location = new System.Drawing.Point(0, 0), AutoSize = true };
             cboYear = new ComboBox
             {
-                Location = new Point(0, 20),
+                Location = new System.Drawing.Point(0, 20),
                 Size = new Size(150, 30),
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
@@ -173,10 +187,10 @@ namespace StudentManagement.Forms
             panelFilters.Controls.Add(cboYear);
 
             // Semester Filter
-            Label lblSemester = new Label { Text = "Học kỳ", Location = new Point(170, 0), AutoSize = true };
+            Label lblSemester = new Label { Text = "Học kỳ", Location = new System.Drawing.Point(170, 0), AutoSize = true };
             cboSemester = new ComboBox
             {
-                Location = new Point(170, 20),
+                Location = new System.Drawing.Point(170, 20),
                 Size = new Size(120, 30),
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
@@ -186,10 +200,10 @@ namespace StudentManagement.Forms
             panelFilters.Controls.Add(cboSemester);
 
             // Status Filter
-            Label lblStatus = new Label { Text = "Trạng thái", Location = new Point(310, 0), AutoSize = true };
+            Label lblStatus = new Label { Text = "Trạng thái", Location = new System.Drawing.Point(310, 0), AutoSize = true };
             cboStatus = new ComboBox
             {
-                Location = new Point(310, 20),
+                Location = new System.Drawing.Point(310, 20),
                 Size = new Size(150, 30),
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
@@ -198,34 +212,38 @@ namespace StudentManagement.Forms
             panelFilters.Controls.Add(lblStatus);
             panelFilters.Controls.Add(cboStatus);
 
-            // Export Buttons
-            Button btnPDF = new Button
-            {
-                Text = "📄 Xuất PDF",
-                Location = new Point(850, 20),
-                Size = new Size(120, 35),
-                BackColor = Color.FromArgb(79, 70, 229),
-                ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat,
-                Cursor = Cursors.Hand
-            };
-            btnPDF.FlatAppearance.BorderSize = 0;
-            panelFilters.Controls.Add(btnPDF);
+                // Export Buttons
+                Button btnPDF = new Button
+                {
+                    Text = "Xuất PDF",
+                    Location = new System.Drawing.Point(560, 20),
+                    Size = new Size(120, 35),
+                    BackColor = Color.FromArgb(239, 68, 68), // đỏ nổi bật
+                    ForeColor = Color.White,
+                    FlatStyle = FlatStyle.Flat,
+                    Cursor = Cursors.Hand,
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold)
+                };
+                btnPDF.FlatAppearance.BorderSize = 0;
+                btnPDF.Click += (s, e) => ExportToPDF();
+                panelFilters.Controls.Add(btnPDF);
 
-            Button btnExcel = new Button
-            {
-                Text = "📊 Xuất Excel",
-                Location = new Point(980, 20),
-                Size = new Size(120, 35),
-                BackColor = Color.White,
-                ForeColor = Color.FromArgb(107, 114, 128),
-                FlatStyle = FlatStyle.Flat,
-                Cursor = Cursors.Hand
-            };
-            btnExcel.FlatAppearance.BorderColor = Color.FromArgb(209, 213, 219);
-            panelFilters.Controls.Add(btnExcel);
+                Button btnExcel = new Button
+                {
+                    Text = "Xuất Excel",
+                    Location = new System.Drawing.Point(700, 20),
+                    Size = new Size(120, 35),
+                    BackColor = Color.FromArgb(34, 197, 94),
+                    ForeColor = Color.White,
+                    FlatStyle = FlatStyle.Flat,
+                    Cursor = Cursors.Hand,
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold)
+                };
+                btnExcel.FlatAppearance.BorderSize = 0;
+                btnExcel.Click += (s, e) => ExportToExcel();
+                panelFilters.Controls.Add(btnExcel);
 
-            panelContent.Controls.Add(panelFilters);
+                panelContent.Controls.Add(panelFilters);
 
             try
             {
@@ -268,7 +286,7 @@ namespace StudentManagement.Forms
                 {
                     Text = "Danh sách lớp học",
                     Font = new Font("Segoe UI", 14, FontStyle.Bold),
-                    Location = new Point(0, tableY),
+                    Location = new System.Drawing.Point(0, tableY),
                     AutoSize = true
                 };
                 panelContent.Controls.Add(lblCourses);
@@ -284,6 +302,18 @@ namespace StudentManagement.Forms
                                        LEFT JOIN Users u ON t.UserId = u.UserId
                                        ORDER BY c.CourseId DESC";
                 dgvCourses.DataSource = DatabaseHelper.ExecuteQuery(queryCourses);
+                dgvCourses.ColumnHeadersHeight = 40;
+                dgvCourses.RowTemplate.Height = 30;
+
+
+                // Tắt hiệu ứng chọn (highlight xanh) trong DataGridView
+                dgvCourses.DefaultCellStyle.SelectionBackColor = dgvCourses.DefaultCellStyle.BackColor;
+                dgvCourses.DefaultCellStyle.SelectionForeColor = dgvCourses.DefaultCellStyle.ForeColor;
+                dgvCourses.RowsDefaultCellStyle.SelectionBackColor = dgvCourses.DefaultCellStyle.BackColor;
+                dgvCourses.RowsDefaultCellStyle.SelectionForeColor = dgvCourses.DefaultCellStyle.ForeColor;
+                dgvCourses.ColumnHeadersDefaultCellStyle.SelectionBackColor = dgvCourses.ColumnHeadersDefaultCellStyle.BackColor;
+                dgvCourses.ColumnHeadersDefaultCellStyle.SelectionForeColor = dgvCourses.ColumnHeadersDefaultCellStyle.ForeColor;
+
                 panelContent.Controls.Add(dgvCourses);
 
                 // Students Table
@@ -291,7 +321,7 @@ namespace StudentManagement.Forms
                 {
                     Text = "Danh sách sinh viên",
                     Font = new Font("Segoe UI", 14, FontStyle.Bold),
-                    Location = new Point(0, tableY + 270),
+                    Location = new System.Drawing.Point(0, tableY + 270),
                     AutoSize = true
                 };
                 panelContent.Controls.Add(lblStudents);
@@ -309,6 +339,17 @@ namespace StudentManagement.Forms
                                         INNER JOIN Users u ON s.UserId = u.UserId
                                         ORDER BY s.StudentId DESC";
                 dgvStudents.DataSource = DatabaseHelper.ExecuteQuery(queryStudents);
+                dgvStudents.ColumnHeadersHeight = 40;
+                dgvStudents.RowTemplate.Height = 30;
+
+                // Tắt hiệu ứng chọn (highlight xanh) trong DataGridView
+                dgvStudents.DefaultCellStyle.SelectionBackColor = dgvStudents.DefaultCellStyle.BackColor;
+                dgvStudents.DefaultCellStyle.SelectionForeColor = dgvStudents.DefaultCellStyle.ForeColor;
+                dgvStudents.RowsDefaultCellStyle.SelectionBackColor = dgvStudents.DefaultCellStyle.BackColor;
+                dgvStudents.RowsDefaultCellStyle.SelectionForeColor = dgvStudents.DefaultCellStyle.ForeColor;
+                dgvStudents.ColumnHeadersDefaultCellStyle.SelectionBackColor = dgvStudents.ColumnHeadersDefaultCellStyle.BackColor;
+                dgvStudents.ColumnHeadersDefaultCellStyle.SelectionForeColor = dgvStudents.ColumnHeadersDefaultCellStyle.ForeColor;
+
                 panelContent.Controls.Add(dgvStudents);
 
             }
@@ -329,7 +370,7 @@ namespace StudentManagement.Forms
         {
             Panel card = new Panel
             {
-                Location = new Point(x, y),
+                Location = new System.Drawing.Point(x, y),
                 Size = new Size(260, 120),
                 BackColor = bgColor
             };
@@ -340,7 +381,7 @@ namespace StudentManagement.Forms
                 Text = value,
                 Font = new Font("Segoe UI", 32, FontStyle.Bold),
                 ForeColor = accentColor,
-                Location = new Point(20, 15),
+                Location = new System.Drawing.Point(20, 15),
                 AutoSize = true
             };
             card.Controls.Add(lblValue);
@@ -351,7 +392,7 @@ namespace StudentManagement.Forms
                 Text = title,
                 Font = new Font("Segoe UI", 11),
                 ForeColor = Color.FromArgb(75, 85, 99),
-                Location = new Point(20, 70),
+                Location = new System.Drawing.Point(20, 70),
                 AutoSize = true
             };
             card.Controls.Add(lblTitle);
@@ -362,7 +403,7 @@ namespace StudentManagement.Forms
                 Text = trend,
                 Font = new Font("Segoe UI", 9),
                 ForeColor = Color.FromArgb(107, 114, 128),
-                Location = new Point(20, 92),
+                Location = new System.Drawing.Point(20, 92),
                 AutoSize = true
             };
             card.Controls.Add(lblTrend);
@@ -374,7 +415,7 @@ namespace StudentManagement.Forms
         {
             Panel chartPanel = new Panel
             {
-                Location = new Point(x, y),
+                Location = new  System.Drawing.Point(x, y),
                 Size = new Size(width, height),
                 BackColor = Color.White
             };
@@ -383,7 +424,7 @@ namespace StudentManagement.Forms
             {
                 Text = title,
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
-                Location = new Point(15, 10),
+                Location = new System.Drawing.Point(15, 10),
                 AutoSize = true
             };
             chartPanel.Controls.Add(lblTitle);
@@ -403,7 +444,7 @@ namespace StudentManagement.Forms
                 // Bar
                 Panel bar = new Panel
                 {
-                    Location = new Point(barX, barY + maxHeight - barHeight),
+                    Location = new System.Drawing.Point(barX, barY + maxHeight - barHeight),
                     Size = new Size(barWidth, barHeight),
                     BackColor = Color.FromArgb(99, 102, 241)
                 };
@@ -413,7 +454,7 @@ namespace StudentManagement.Forms
                 Label lblSubject = new Label
                 {
                     Text = subjects[i],
-                    Location = new Point(barX - 5, barY + maxHeight + 5),
+                    Location = new System.Drawing.Point(barX - 5, barY + maxHeight + 5),
                     AutoSize = true,
                     Font = new Font("Segoe UI", 8)
                 };
@@ -429,7 +470,7 @@ namespace StudentManagement.Forms
         {
             Panel chartPanel = new Panel
             {
-                Location = new Point(x, y),
+                Location = new System.Drawing.Point(x, y),
                 Size = new Size(width, height),
                 BackColor = Color.White
             };
@@ -438,7 +479,7 @@ namespace StudentManagement.Forms
             {
                 Text = title,
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
-                Location = new Point(15, 10),
+                Location = new System.Drawing.Point(15, 10),
                 AutoSize = true
             };
             chartPanel.Controls.Add(lblTitle);
@@ -463,7 +504,7 @@ namespace StudentManagement.Forms
                 // Draw circles to simulate donut
                 Panel circle1 = new Panel
                 {
-                    Location = new Point(centerX - radius, centerY - radius),
+                    Location = new System.Drawing.Point(centerX - radius, centerY - radius),
                     Size = new Size(radius * 2, radius * 2),
                     BackColor = Color.FromArgb(236, 72, 153) // Pink
                 };
@@ -472,7 +513,7 @@ namespace StudentManagement.Forms
                 // Center hole
                 Panel centerHole = new Panel
                 {
-                    Location = new Point(centerX - radius/2, centerY - radius/2),
+                    Location = new System.Drawing.Point(centerX - radius/2, centerY - radius/2),
                     Size = new Size(radius, radius),
                     BackColor = Color.White
                 };
@@ -492,7 +533,7 @@ namespace StudentManagement.Forms
         {
             Panel colorBox = new Panel
             {
-                Location = new Point(x, y),
+                Location = new System.Drawing.Point(x, y),
                 Size = new Size(15, 15),
                 BackColor = color
             };
@@ -501,7 +542,7 @@ namespace StudentManagement.Forms
             Label label = new Label
             {
                 Text = text,
-                Location = new Point(x + 20, y - 2),
+                Location = new System.Drawing.Point(x + 20, y - 2),
                 AutoSize = true,
                 Font = new Font("Segoe UI", 9)
             };
@@ -512,7 +553,7 @@ namespace StudentManagement.Forms
         {
             Panel chartPanel = new Panel
             {
-                Location = new Point(x, y),
+                Location = new System.Drawing.Point(x, y),
                 Size = new Size(width, height),
                 BackColor = Color.White
             };
@@ -521,7 +562,7 @@ namespace StudentManagement.Forms
             {
                 Text = title,
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
-                Location = new Point(15, 10),
+                Location = new System.Drawing.Point(15, 10),
                 AutoSize = true
             };
             chartPanel.Controls.Add(lblTitle);
@@ -556,7 +597,7 @@ namespace StudentManagement.Forms
                 // Column
                 Panel col = new Panel
                 {
-                    Location = new Point(colX, colY + maxHeight - colHeight),
+                    Location = new System.Drawing.Point(colX, colY + maxHeight - colHeight),
                     Size = new Size(colWidth, colHeight),
                     BackColor = Color.FromArgb(139, 92, 246)
                 };
@@ -566,7 +607,7 @@ namespace StudentManagement.Forms
                 Label lblValue = new Label
                 {
                     Text = values[i].ToString(),
-                    Location = new Point(colX + colWidth/2 - 10, colY + maxHeight - colHeight - 20),
+                    Location = new System.Drawing.Point(colX + colWidth/2 - 10, colY + maxHeight - colHeight - 20),
                     AutoSize = true,
                     Font = new Font("Segoe UI", 9, FontStyle.Bold),
                     ForeColor = Color.FromArgb(139, 92, 246)
@@ -577,7 +618,7 @@ namespace StudentManagement.Forms
                 Label lblCat = new Label
                 {
                     Text = categories[i],
-                    Location = new Point(colX - 10, colY + maxHeight + 5),
+                    Location = new System.Drawing.Point(colX - 10, colY + maxHeight + 5),
                     Size = new Size(100, 30),
                     Font = new Font("Segoe UI", 8),
                     TextAlign = ContentAlignment.TopCenter
@@ -590,11 +631,12 @@ namespace StudentManagement.Forms
             panelContent.Controls.Add(chartPanel);
         }
 
+
         private DataGridView CreateModernDataGridView(int x, int y, int width, int height)
         {
             DataGridView dgv = new DataGridView
             {
-                Location = new Point(x, y),
+                Location = new System.Drawing.Point(x, y),
                 Size = new Size(width, height),
                 ReadOnly = true,
                 AllowUserToAddRows = false,
@@ -621,6 +663,225 @@ namespace StudentManagement.Forms
             };
 
             return dgv;
+        }
+
+        private void ExportToPDF()
+        {
+            try
+            {
+                SaveFileDialog saveDialog = new SaveFileDialog();
+                saveDialog.Filter = "PDF Files (*.pdf)|*.pdf";
+                saveDialog.FileName = $"BaoCao_DanhSachLop_SinhVien_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
+
+                if (saveDialog.ShowDialog() != DialogResult.OK) return;
+
+                // Lấy dữ liệu 2 bảng
+                DataTable dtLopHoc = DatabaseHelper.ExecuteQuery(@"
+            SELECT 
+                c.CourseCode AS [Mã lớp],
+                c.CourseName AS [Tên lớp],
+                ISNULL(u.FullName, 'Chưa có') AS [Giảng viên],
+                c.Semester + ' ' + CAST(c.AcademicYear AS VARCHAR) AS [Năm học - Học kỳ],
+                (SELECT COUNT(*) FROM Enrollments WHERE CourseId = c.CourseId) AS [Số lượng SV],
+                CASE WHEN c.IsActive = 1 THEN N'Đang diễn ra' ELSE N'Đã kết thúc' END AS [Trạng thái]
+            FROM Courses c
+            LEFT JOIN Teachers t ON c.TeacherId = t.TeacherId
+            LEFT JOIN Users u ON t.UserId = u.UserId
+            ORDER BY c.CourseId DESC");
+
+                DataTable dtSinhVien = DatabaseHelper.ExecuteQuery(@"
+            SELECT 
+                s.StudentCode AS [Mã SV],
+                u.FullName AS [Họ và tên],
+                ISNULL(s.Major, 'Chưa xác định') AS [Ngành học],
+                CASE WHEN EXISTS(SELECT 1 FROM Enrollments e WHERE e.StudentId = s.StudentId AND e.Status = 'Enrolled')
+                     THEN N'Đang học' ELSE N'Bảo lưu' END AS [Trạng thái],
+                FORMAT(ISNULL(s.GPA, 0), 'N1') AS [GPA]
+            FROM Students s
+            INNER JOIN Users u ON s.UserId = u.UserId
+            ORDER BY s.StudentId DESC");
+
+                // TẠO PDF – ĐÃ FIX LỖI FileStream
+                using (var stream = new FileStream(saveDialog.FileName, FileMode.Create, FileAccess.Write))
+                using (var writer = new iText.Kernel.Pdf.PdfWriter(stream))
+                using (var pdf = new iText.Kernel.Pdf.PdfDocument(writer))
+                using (var document = new iText.Layout.Document(pdf, iText.Kernel.Geom.PageSize.A4))
+                {
+                    document.SetMargins(40, 40, 40, 40);
+
+                    // Font tiếng Việt
+                    string fontPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "arial.ttf");
+                    string boldPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "arialbd.ttf");
+
+                    var font = iText.Kernel.Font.PdfFontFactory.CreateFont(fontPath, iText.IO.Font.PdfEncodings.IDENTITY_H);
+                    var boldFont = File.Exists(boldPath)
+                        ? iText.Kernel.Font.PdfFontFactory.CreateFont(boldPath, iText.IO.Font.PdfEncodings.IDENTITY_H)
+                        : font;
+
+                    // Tiêu đề
+                    document.Add(new iText.Layout.Element.Paragraph("BÁO CÁO DANH SÁCH LỚP HỌC & SINH VIÊN")
+                        .SetFont(boldFont).SetFontSize(20)
+                        .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
+                        .SetMarginBottom(10));
+
+                    document.Add(new iText.Layout.Element.Paragraph($"Ngày xuất: {DateTime.Now:dd/MM/yyyy HH:mm:ss}")
+                        .SetFont(font).SetFontSize(12)
+                        .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
+                        .SetMarginBottom(30));
+
+                    // BẢNG 1: LỚP HỌC
+                    document.Add(new iText.Layout.Element.Paragraph("1. DANH SÁCH LỚP HỌC")
+                        .SetFont(boldFont).SetFontSize(16).SetMarginBottom(10));
+
+                    var table1 = new iText.Layout.Element.Table(UnitValue.CreatePercentArray(dtLopHoc.Columns.Count))
+                        .UseAllAvailableWidth();
+
+                    // Header
+                    foreach (DataColumn col in dtLopHoc.Columns)
+                    {
+                        table1.AddHeaderCell(new iText.Layout.Element.Cell()
+                            .Add(new iText.Layout.Element.Paragraph(col.ColumnName).SetFont(boldFont).SetFontSize(11))
+                            .SetBackgroundColor(iText.Kernel.Colors.ColorConstants.LIGHT_GRAY)
+                            .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
+                            .SetPadding(8));
+                    }
+
+                    // Dữ liệu
+                    foreach (DataRow row in dtLopHoc.Rows)
+                    {
+                        foreach (var item in row.ItemArray)
+                        {
+                            table1.AddCell(new iText.Layout.Element.Cell()
+                                .Add(new iText.Layout.Element.Paragraph(item?.ToString() ?? "").SetFont(font).SetFontSize(10))
+                                .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
+                                .SetPadding(6));
+                        }
+                    }
+                    document.Add(table1.SetMarginBottom(40));
+
+                    // BẢNG 2: SINH VIÊN
+                    document.Add(new iText.Layout.Element.Paragraph("2. DANH SÁCH SINH VIÊN")
+                        .SetFont(boldFont).SetFontSize(16).SetMarginBottom(10));
+
+                    var table2 = new iText.Layout.Element.Table(UnitValue.CreatePercentArray(dtSinhVien.Columns.Count))
+                        .UseAllAvailableWidth();
+
+                    foreach (DataColumn col in dtSinhVien.Columns)
+                    {
+                        table2.AddHeaderCell(new iText.Layout.Element.Cell()
+                            .Add(new iText.Layout.Element.Paragraph(col.ColumnName).SetFont(boldFont).SetFontSize(11))
+                            .SetBackgroundColor(iText.Kernel.Colors.ColorConstants.LIGHT_GRAY)
+                            .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
+                            .SetPadding(8));
+                    }
+
+                    foreach (DataRow row in dtSinhVien.Rows)
+                    {
+                        foreach (var item in row.ItemArray)
+                        {
+                            table2.AddCell(new iText.Layout.Element.Cell()
+                                .Add(new iText.Layout.Element.Paragraph(item?.ToString() ?? "").SetFont(font).SetFontSize(10))
+                                .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
+                                .SetPadding(6));
+                        }
+                    }
+                    document.Add(table2);
+
+                    // Footer
+                    document.Add(new iText.Layout.Element.Paragraph($"\nNgười xuất báo cáo: {SessionManager.CurrentUser?.FullName ?? "Administrator"}")
+                        .SetFont(font).SetFontSize(11)
+                        .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
+                        .SetMarginTop(50));
+                }
+
+                MessageBox.Show("XUẤT PDF THÀNH CÔNG HOÀN HẢO!\n2 bảng dữ liệu đẹp như báo cáo trường đại học!\nĐang mở file...",
+                    "10/10 ĐÃ VỀ TAY!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // Mở file tự động
+                var psi = new ProcessStartInfo(saveDialog.FileName) { UseShellExecute = true };
+                System.Diagnostics.Process.Start(psi);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi: " + ex.Message + "\n\nChi tiết: " + ex.StackTrace, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void ExportToExcel()
+        {
+            try
+            {
+                SaveFileDialog saveDialog = new SaveFileDialog
+                {
+                    Filter = "Excel Files (*.xlsx)|*.xlsx",
+                    FileName = $"BaoCao_DanhSach_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx"
+                };
+
+                if (saveDialog.ShowDialog() != DialogResult.OK) return;
+
+                // DÙNG ClosedXML – KHÔNG CẦN LICENSE, KHÔNG BAO GIỜ LỖI!
+                using (var workbook = new ClosedXML.Excel.XLWorkbook())
+                {
+                    // ================== SHEET 1: DANH SÁCH LỚP HỌC ==================
+                    var ws1 = workbook.Worksheets.Add("Danh sách lớp học");
+                    var dtLop = DatabaseHelper.ExecuteQuery(@"
+                SELECT 
+                    c.CourseCode AS [Mã lớp],
+                    c.CourseName AS [Tên lớp],
+                    ISNULL(u.FullName, 'Chưa có') AS [Giảng viên],
+                    c.Semester + ' ' + CAST(c.AcademicYear AS VARCHAR) AS [Năm học - Học kỳ],
+                    (SELECT COUNT(*) FROM Enrollments WHERE CourseId = c.CourseId) AS [Số lượng SV],
+                    CASE WHEN c.IsActive = 1 THEN N'Đang diễn ra' ELSE N'Đã kết thúc' END AS [Trạng thái]
+                FROM Courses c
+                LEFT JOIN Teachers t ON c.TeacherId = t.TeacherId
+                LEFT JOIN Users u ON t.UserId = u.UserId
+                ORDER BY c.CourseId DESC");
+
+                    // Đổ dữ liệu + tạo header tự động
+                    var table1 = ws1.Cell(1, 1).InsertTable(dtLop, "TableLopHoc", true);
+                    ws1.Columns().AdjustToContents();
+
+                    // Đẹp hóa header
+                    ws1.Row(1).Style.Font.Bold = true;
+                    ws1.Row(1).Style.Fill.BackgroundColor = ClosedXML.Excel.XLColor.FromArgb(79, 70, 229);
+                    ws1.Row(1).Style.Font.FontColor = ClosedXML.Excel.XLColor.White;
+                    ws1.Row(1).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+
+                    // ================== SHEET 2: DANH SÁCH SINH VIÊN ==================
+                    var ws2 = workbook.Worksheets.Add("Danh sách sinh viên");
+                    var dtSV = DatabaseHelper.ExecuteQuery(@"
+                SELECT 
+                    s.StudentCode AS [Mã SV],
+                    u.FullName AS [Họ và tên],
+                    ISNULL(s.Major, 'Chưa xác định') AS [Ngành học],
+                    CASE WHEN EXISTS(SELECT 1 FROM Enrollments e WHERE e.StudentId = s.StudentId AND e.Status = 'Enrolled')
+                         THEN N'Đang học' ELSE N'Bảo lưu' END AS [Trạng thái],
+                    ISNULL(FORMAT(s.GPA, 'N1'), '0,0') AS [GPA]
+                FROM Students s
+                INNER JOIN Users u ON s.UserId = u.UserId
+                ORDER BY s.StudentId DESC");
+
+                    var table2 = ws2.Cell(1, 1).InsertTable(dtSV, "TableSinhVien", true);
+                    ws2.Columns().AdjustToContents();
+
+                    ws2.Row(1).Style.Font.Bold = true;
+                    ws2.Row(1).Style.Fill.BackgroundColor = ClosedXML.Excel.XLColor.FromArgb(34, 197, 94);
+                    ws2.Row(1).Style.Font.FontColor = ClosedXML.Excel.XLColor.White;
+                    ws2.Row(1).Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+
+                    // Lưu file
+                    workbook.SaveAs(saveDialog.FileName);
+                }
+
+                MessageBox.Show("XUẤT EXCEL THÀNH CÔNG HOÀN HẢO!\nDùng ClosedXML – Không bao giờ lỗi license nữa!\nĐang mở file...",
+                    "SIÊU PHẨM 1000%", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                System.Diagnostics.Process.Start(new ProcessStartInfo(saveDialog.FileName) { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void LoadStudentManagement()

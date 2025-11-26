@@ -219,7 +219,7 @@ namespace StudentManagement.Forms
             {
                 Text = "💾 Lưu thông tin",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Location = new Point(440, yPos + 70),
+                Location = new Point(440, yPos+70),
                 Size = new Size(140, 45),
                 BackColor = Color.FromArgb(39, 174, 96),
                 ForeColor = Color.White,

@@ -187,7 +187,7 @@ Số điện thoại: {SessionManager.CurrentUser.Phone}";
                     ForeColor = Color.FromArgb(52, 73, 94)
                 };
                 panelContent.Controls.Add(lblCourses);
-
+                                
                 DataGridView dgvCourses = new DataGridView
                 {
                     Location = new Point(20, 480),

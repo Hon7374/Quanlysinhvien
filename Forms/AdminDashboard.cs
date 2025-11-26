@@ -50,12 +50,12 @@ namespace StudentManagement.Forms
 
             // Menu Buttons
             int yPos = 100;
-            AddMenuButton("📊 Tổng quan", yPos, (s, e) => LoadDashboard()); yPos += 70;
-            AddMenuButton("👨‍🎓 Quản lý Sinh viên", yPos, (s, e) => LoadStudentManagement()); yPos += 70;
-            AddMenuButton("👨‍🏫 Quản lý Giảng viên", yPos, (s, e) => LoadTeacherManagement()); yPos += 70;
-            AddMenuButton("📚 Quản lý Môn học", yPos, (s, e) => LoadCourseManagement()); yPos += 70;
-            AddMenuButton("👤 Quản lý Tài khoản", yPos, (s, e) => LoadUserManagement()); yPos += 70;
-            AddMenuButton("📈 Báo cáo Thống kê", yPos, (s, e) => LoadReports()); yPos += 70;
+            AddMenuButton("📊 Tổng quan", yPos, (s, e) => LoadDashboard()); yPos += 50;
+            AddMenuButton("👨‍🎓 Quản lý Sinh viên", yPos, (s, e) => LoadStudentManagement()); yPos += 50;
+            AddMenuButton("👨‍🏫 Quản lý Giảng viên", yPos, (s, e) => LoadTeacherManagement()); yPos += 50;
+            AddMenuButton("📚 Quản lý Môn học", yPos, (s, e) => LoadCourseManagement()); yPos += 50;
+            AddMenuButton("👤 Quản lý Tài khoản", yPos, (s, e) => LoadUserManagement()); yPos += 50;
+            AddMenuButton("📈 Báo cáo Thống kê", yPos, (s, e) => LoadReports()); yPos += 50;
             AddMenuButton("🚪 Đăng xuất", yPos, (s, e) => Logout());
 
             // Content Panel

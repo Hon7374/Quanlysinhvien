@@ -199,7 +199,7 @@ namespace StudentManagement.Forms
                 Padding = new Padding(30),
                 AutoScroll = true
             };
-
+            
             panelContent.HorizontalScroll.Enabled = false;
             panelContent.HorizontalScroll.Visible = false;
             panelContent.HorizontalScroll.Maximum = 0;

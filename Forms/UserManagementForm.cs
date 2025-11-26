@@ -130,7 +130,7 @@ namespace StudentManagement.Forms
                 Size = new Size(1040, 80),
                 BackColor = Color.White
             };
-
+                        
             // Search Box
             Panel searchBg = new Panel
             {
@@ -277,7 +277,7 @@ namespace StudentManagement.Forms
                     dgvUsers.Columns["Toggle"].ReadOnly = true;
                     dgvUsers.Columns["Toggle"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
                     dgvUsers.Columns["Toggle"].DefaultCellStyle.Font = new Font("Segoe UI", 9, FontStyle.Bold);
-
+                    
                     // Add Avatar Column
                     //if (!dgvUsers.Columns.Contains("Avatar"))
                     //{
