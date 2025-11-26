@@ -249,10 +249,10 @@ namespace StudentManagement.Forms
 
         private void CreateScheduleGrid(DataTable courses)
         {
-            int cellWidth = 130;
-            int cellHeight = 80;
-            int headerHeight = 40;
-            int timeColumnWidth = 100;
+            int cellWidth = 150;        // Tăng từ 130 → 210 (rộng hơn 60%)
+            int cellHeight = 90;       // Tăng từ 80 → 120 (cao hơn 50%)
+            int headerHeight = 40;      // Header ngày to hơn
+            int timeColumnWidth = 100;  // Cột giờ cũng to hơn cho dễ đọc
 
             // Header row (days of week)
             Label lblTime = new Label

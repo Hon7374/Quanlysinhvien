@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|c:\\users\\acer\\downloads\\quanlysinhvien\\forms\\scheduleform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|solutionrelative:forms\\scheduleform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|c:\\users\\acer\\downloads\\quanlysinhvien\\forms\\admindashboardmodern.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|solutionrelative:forms\\admindashboardmodern.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -18,7 +22,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Bookmark",
@@ -37,25 +41,33 @@
               "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
             },
             {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
-            },
-            {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "AdminDashboardModern.cs",
-              "DocumentMoniker": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\AdminDashboardModern.cs",
-              "RelativeDocumentMoniker": "Forms\\AdminDashboardModern.cs",
-              "ToolTip": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\AdminDashboardModern.cs",
-              "RelativeToolTip": "Forms\\AdminDashboardModern.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
+              "Title": "ScheduleForm.cs",
+              "DocumentMoniker": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\ScheduleForm.cs",
+              "RelativeDocumentMoniker": "Forms\\ScheduleForm.cs",
+              "ToolTip": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\ScheduleForm.cs",
+              "RelativeToolTip": "Forms\\ScheduleForm.cs",
+              "ViewState": "AgIAAKUBAAAAAAAAAAAcwLEBAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-26T14:35:27.392Z",
+              "WhenOpened": "2025-11-26T14:47:14.882Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "AdminDashboardModern.cs",
+              "DocumentMoniker": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\AdminDashboardModern.cs",
+              "RelativeDocumentMoniker": "Forms\\AdminDashboardModern.cs",
+              "ToolTip": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\AdminDashboardModern.cs",
+              "RelativeToolTip": "Forms\\AdminDashboardModern.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-26T14:35:27.392Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "StudentCreateForm.cs",
               "DocumentMoniker": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\StudentCreateForm.cs",
               "RelativeDocumentMoniker": "Forms\\StudentCreateForm.cs",
@@ -63,8 +75,7 @@
               "RelativeToolTip": "Forms\\StudentCreateForm.cs",
               "ViewState": "AgIAAGcBAAAAAAAAAAAYwHQBAABJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-19T07:21:10.999Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-19T07:21:10.999Z"
             }
           ]
         }
