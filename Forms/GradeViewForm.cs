@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using StudentManagement.Data;
 using StudentManagement.Helpers;
+using ClosedXML.Excel;
 
 namespace StudentManagement.Forms
 {
@@ -93,7 +94,7 @@ namespace StudentManagement.Forms
             {
                 Text = "📥 Xuất Excel",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Location = new Point(1170, 90),
+                Location = new Point(870, 90),
                 Size = new Size(150, 45),
                 BackColor = Color.FromArgb(16, 185, 129),
                 ForeColor = Color.White,
@@ -113,14 +114,20 @@ namespace StudentManagement.Forms
                 Location = new Point(30, 200),
                 Size = new Size(1320, 650),
                 BackColor = Color.White,
-                Padding = new Padding(20)
+                Padding = new Padding(20),
+                AutoScroll = true
             };
+
+            panelContent.HorizontalScroll.Enabled = false;
+            panelContent.HorizontalScroll.Visible = false;
+            panelContent.HorizontalScroll.Maximum = 0;
+            panelContent.AutoScrollMinSize = new Size(0, 1000); // đảm bảo có chỗ cuộn dọc
 
             // DataGridView
             dgvGrades = new DataGridView
             {
                 Location = new Point(20, 20),
-                Size = new Size(1280, 600),
+                Size = new Size(1180, 600),
                 ReadOnly = true,
                 AllowUserToAddRows = false,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
@@ -340,8 +347,144 @@ namespace StudentManagement.Forms
 
         private void BtnExport_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Chức năng xuất Excel sẽ được triển khai sau!", "Thông báo",
-                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            var selected = cboCourse.SelectedItem as CourseItem;
+            if (selected == null || selected.Value == 0)
+            {
+                MessageBox.Show("Vui lòng chọn môn học trước khi xuất Excel!", "Thông báo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            SaveFileDialog saveDlg = new SaveFileDialog
+            {
+                Filter = "Excel files (*.xlsx)|*.xlsx",
+                FileName = $"Diem_{selected.Text.Replace(" ", "_").Replace("/", "-")}_{DateTime.Now:yyyyMMdd_HHmm}.xlsx",
+                Title = "Xuất danh sách điểm ra Excel"
+            };
+
+            if (saveDlg.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    ExportToExcel_ClosedXML(dgvGrades.DataSource as DataTable, selected.Text, lblStats.Text, saveDlg.FileName);
+
+                    MessageBox.Show($"Xuất Excel thành công!\nĐã lưu tại:\n{saveDlg.FileName}", "Thành công",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = saveDlg.FileName,
+                        UseShellExecute = true
+                    });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Lỗi khi xuất Excel:\n" + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void ExportToExcel_ClosedXML(DataTable dt, string courseName, string statsText, string filePath)
+        {
+            using (var workbook = new XLWorkbook())
+            {
+                var ws = workbook.Worksheets.Add("Danh sách điểm");
+
+                // Tiêu đề
+                ws.Cell("A1").Value = "BẢNG ĐIỂM MÔN HỌC";
+                ws.Cell("A1").Style.Font.FontSize = 18;
+                ws.Cell("A1").Style.Font.Bold = true;
+                ws.Cell("A1").Style.Font.FontColor = XLColor.FromArgb(31, 41, 55);
+
+                ws.Cell("A2").Value = courseName;
+                ws.Cell("A2").Style.Font.FontSize = 14;
+                ws.Cell("A2").Style.Font.Bold = true;
+                ws.Cell("A2").Style.Font.FontColor = XLColor.FromArgb(79, 70, 229);
+
+                ws.Cell("A3").Value = $"Xuất lúc: {DateTime.Now:dd/MM/yyyy HH:mm:ss}";
+                ws.Cell("A3").Style.Font.Italic = true;
+                ws.Cell("A3").Style.Font.FontColor = XLColor.Gray;
+
+                // Chèn bảng dữ liệu
+                var table = ws.Cell(6, 1).InsertTable(dt, false);
+                table.Theme = XLTableTheme.None;
+                table.ShowAutoFilter = false;
+
+                // Định dạng header
+                var headerRow = ws.Row(6);
+                headerRow.Style.Font.Bold = true;
+                headerRow.Style.Fill.BackgroundColor = XLColor.FromArgb(79, 70, 229);
+                headerRow.Style.Font.FontColor = XLColor.White;
+                headerRow.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                // Tìm cột "Kết quả" và "Xếp loại"
+                int colResult = -1, colGrade = -1;
+                for (int c = 1; c <= dt.Columns.Count; c++)
+                {
+                    string header = ws.Cell(6, c).GetString();
+                    if (header == "Kết quả") colResult = c;
+                    if (header == "Xếp loại") colGrade = c;
+                }
+
+                // Tô màu dữ liệu
+                for (int r = 7; r <= dt.Rows.Count + 6; r++)
+                {
+                    if (colResult > 0)
+                    {
+                        var cellResult = ws.Cell(r, colResult);
+                        string result = cellResult.GetString();
+                        if (result == "Đạt")
+                        {
+                            cellResult.Style.Font.FontColor = XLColor.FromArgb(16, 185, 129);
+                            cellResult.Style.Font.Bold = true;
+                        }
+                        else if (result == "Không đạt")
+                        {
+                            cellResult.Style.Font.FontColor = XLColor.FromArgb(239, 68, 68);
+                            cellResult.Style.Font.Bold = true;
+                        }
+                    }
+
+                    if (colGrade > 0)
+                    {
+                        var cellGrade = ws.Cell(r, colGrade);
+                        string grade = cellGrade.GetString();
+                        if (grade == "A")
+                            cellGrade.Style.Fill.BackgroundColor = XLColor.FromArgb(220, 252, 231);
+                        else if (grade == "B")
+                            cellGrade.Style.Fill.BackgroundColor = XLColor.FromArgb(219, 234, 254);
+                        else if (grade == "F")
+                            cellGrade.Style.Fill.BackgroundColor = XLColor.FromArgb(254, 226, 226);
+                    }
+                }
+
+                // Thống kê
+                int statRow = dt.Rows.Count + 9;
+                ws.Cell(statRow, 1).Value = "THỐNG KÊ";
+                ws.Cell(statRow, 1).Style.Font.Bold = true;
+                ws.Cell(statRow, 1).Style.Font.FontSize = 12;
+
+                ws.Cell(statRow + 1, 1).Value = statsText.Replace("Tổng:", "Tổng:").Replace("Chart", "");
+                ws.Cell(statRow + 1, 1).Style.Font.Italic = true;
+                ws.Cell(statRow + 1, 1).Style.Font.FontColor = XLColor.FromArgb(107, 114, 128);
+
+                // Tự động điều chỉnh độ rộng cột (ClosedXML cho phép dùng AdjustToContents)
+                ws.Columns().AdjustToContents();
+
+                // Thêm chút khoảng cách cho đẹp (gán từng cột)
+                ws.Column(1).Width = 12;   // MSSV
+                ws.Column(2).Width = 28;   // Họ tên
+                ws.Column(3).Width = 12;   // Lớp
+                ws.Column(9).Width = 18;   // Cập nhật lần cuối
+
+                // Viền bảng
+                var dataRange = ws.Range(6, 1, dt.Rows.Count + 6, dt.Columns.Count);
+                dataRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+                dataRange.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+
+                // Lưu file
+                workbook.SaveAs(filePath);
+            }
         }
 
         private class CourseItem

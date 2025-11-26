@@ -85,14 +85,20 @@ namespace StudentManagement.Forms
                 Location = new Point(30, 170),
                 Size = new Size(1320, 650),
                 BackColor = Color.White,
-                Padding = new Padding(20)
+                Padding = new Padding(20),
+                AutoScroll = true
             };
+
+            panelContent.HorizontalScroll.Enabled = false;
+            panelContent.HorizontalScroll.Visible = false;
+            panelContent.HorizontalScroll.Maximum = 0;
+            panelContent.AutoScrollMinSize = new Size(0, 1000); // đảm bảo có chỗ cuộn dọc
 
             // DataGridView
             dgvStudents = new DataGridView
             {
                 Location = new Point(20, 20),
-                Size = new Size(1280, 550),
+                Size = new Size(1180, 550),
                 AllowUserToAddRows = false,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
                 BackgroundColor = Color.White,
@@ -416,7 +422,7 @@ namespace StudentManagement.Forms
             {
                 Text = "💾 Lưu",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Location = new Point(250, 240),
+                Location = new Point(-500, 240),
                 Size = new Size(100, 40),
                 BackColor = Color.FromArgb(16, 185, 129),
                 ForeColor = Color.White,

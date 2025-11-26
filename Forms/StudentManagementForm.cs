@@ -1,10 +1,12 @@
+using ClosedXML.Excel;
+using StudentManagement.Data;
+using StudentManagement.Models;
 using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
-using StudentManagement.Data;
-using StudentManagement.Models;
 
 namespace StudentManagement.Forms
 {
@@ -102,7 +104,7 @@ namespace StudentManagement.Forms
             {
                 Font = new Font("Segoe UI", 10),
                 Location = new Point(40, 12),
-                Size = new Size(350, 30),
+                Size = new Size(350, 35),
                 BorderStyle = BorderStyle.None,
                 BackColor = Color.FromArgb(249, 250, 251),
                 PlaceholderText = "Tìm kiếm sinh viên theo MSSV hoặc Họ tên"
@@ -128,7 +130,7 @@ namespace StudentManagement.Forms
                 Location = new Point(450, 25),
                 Size = new Size(180, 35),
                 DropDownStyle = ComboBoxStyle.DropDownList,
-                FlatStyle = FlatStyle.Flat
+                FlatStyle = FlatStyle.Standard
             };
             cboClass.SelectedIndexChanged += Filter_Changed;
             panelFilters.Controls.Add(cboClass);
@@ -150,7 +152,7 @@ namespace StudentManagement.Forms
                 Location = new Point(650, 25),
                 Size = new Size(200, 35),
                 DropDownStyle = ComboBoxStyle.DropDownList,
-                FlatStyle = FlatStyle.Flat
+                FlatStyle = FlatStyle.Standard
             };
             cboMajor.SelectedIndexChanged += Filter_Changed;
             panelFilters.Controls.Add(cboMajor);
@@ -172,12 +174,43 @@ namespace StudentManagement.Forms
                 Location = new Point(870, 25),
                 Size = new Size(180, 35),
                 DropDownStyle = ComboBoxStyle.DropDownList,
-                FlatStyle = FlatStyle.Flat
+                FlatStyle = FlatStyle.Standard
             };
             cboStatus.Items.AddRange(new object[] { "Tất cả", "Đang học", "Bảo lưu", "Đã tốt nghiệp" });
             cboStatus.SelectedIndex = 0;
             cboStatus.SelectedIndexChanged += Filter_Changed;
             panelFilters.Controls.Add(cboStatus);
+
+            // Upload/Download Buttons
+            Button btnUpload = new Button
+            {
+                Text = "⬆ Tải lên",
+                Font = new Font("Segoe UI", 10),
+                Location = new Point(950, 60),
+                Size = new Size(120, 45),
+                BackColor = Color.White,
+                ForeColor = Color.FromArgb(107, 114, 128),
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
+            };
+            btnUpload.FlatAppearance.BorderColor = Color.FromArgb(99, 102, 241);
+            btnUpload.Click += BtnImportExcel_Click;  // ← THÊM DÒNG NÀY
+            panelHeader.Controls.Add(btnUpload);
+
+            Button btnDownload = new Button
+            {
+                Text = "⬇ Tải xuống",
+                Font = new Font("Segoe UI", 10),
+                Location = new Point(1100, 60),
+                Size = new Size(130, 45),
+                BackColor = Color.White,
+                ForeColor = Color.FromArgb(107, 114, 128),
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
+            };
+            btnDownload.FlatAppearance.BorderColor = Color.FromArgb(99, 102, 241);
+            btnDownload.Click += BtnExportExcel_Click;  // ← THÊM DÒNG NÀY
+            panelHeader.Controls.Add(btnDownload);
 
             // Content Panel
             panelContent = new Panel
@@ -188,11 +221,16 @@ namespace StudentManagement.Forms
                 AutoScroll = true
             };
 
+            panelContent.HorizontalScroll.Enabled = false;
+            panelContent.HorizontalScroll.Visible = false;
+            panelContent.HorizontalScroll.Maximum = 0;
+            panelContent.AutoScrollMinSize = new Size(0, 1000); // đảm bảo có chỗ cuộn dọc
+
             // DataGridView for Students
             dgvStudents = new DataGridView
             {
-                Location = new Point(0, 20),
-                Size = new Size(1320, 650),
+                Location = new Point(35, 20),
+                Size = new Size(330, 650),
                 Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
                 ReadOnly = true,
                 AllowUserToAddRows = false,
@@ -226,6 +264,11 @@ namespace StudentManagement.Forms
             this.Controls.Add(panelContent);
             this.Controls.Add(panelFilters);
             this.Controls.Add(panelHeader);
+
+            //// THÊM 3 DÒNG NÀY VÀO ĐÂY – SIÊU QUAN TRỌNG!
+            //this.FormBorderStyle = FormBorderStyle.None;   // ← BỎ HOÀN TOÀN VIỀN WINDOWS
+            //this.WindowState = FormWindowState.Maximized;  // ← Full màn hình (tùy chọn)
+            //this.StartPosition = FormStartPosition.CenterScreen;
         }
 
         private void CreateStudentsTableIfNotExists()
@@ -392,7 +435,7 @@ namespace StudentManagement.Forms
                         DataGridViewButtonColumn viewCol = new DataGridViewButtonColumn
                         {
                             Name = "View",
-                            HeaderText = "HÀNH ĐỘNG",
+                            HeaderText = "",
                             Text = "👁",
                             UseColumnTextForButtonValue = true,
                             FlatStyle = FlatStyle.Flat,
@@ -468,6 +511,135 @@ namespace StudentManagement.Forms
             {
                 MessageBox.Show($"Lỗi khi tải danh sách sinh viên: {ex.Message}", "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // === XUẤT & NHẬP EXCEL (ĐÃ SỬA LỖI) ===
+        private void BtnExportExcel_Click(object sender, EventArgs e)
+        {
+            var saveDialog = new SaveFileDialog
+            {
+                Filter = "Excel files (*.xlsx)|*.xlsx",
+                FileName = $"DanhSachSinhVien_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx"
+            };
+
+            if (saveDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    using (var workbook = new XLWorkbook())
+                    {
+                        var ws = workbook.Worksheets.Add("Danh sách sinh viên");
+
+                        // Header
+                        for (int i = 0; i < dgvStudents.Columns.Count; i++)
+                        {
+                            if (dgvStudents.Columns[i].Visible)
+                                ws.Cell(1, dgvStudents.Columns[i].DisplayIndex + 1).Value = dgvStudents.Columns[i].HeaderText;
+                        }
+                        ws.Row(1).Style.Font.Bold = true;
+                        ws.Row(1).Style.Fill.BackgroundColor = XLColor.FromArgb(79, 70, 229);
+                        ws.Row(1).Style.Font.FontColor = XLColor.White;
+
+                        // Data
+                        for (int i = 0; i < dgvStudents.Rows.Count; i++)
+                        {
+                            for (int j = 0; j < dgvStudents.Columns.Count; j++)
+                            {
+                                if (dgvStudents.Columns[j].Visible)
+                                {
+                                    var value = dgvStudents.Rows[i].Cells[j].FormattedValue?.ToString() ?? "";
+                                    ws.Cell(i + 2, dgvStudents.Columns[j].DisplayIndex + 1).Value = value;
+                                }
+                            }
+                        }
+
+                        ws.Columns().AdjustToContents();
+                        workbook.SaveAs(saveDialog.FileName);
+                    }
+                    MessageBox.Show("Xuất Excel thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Lỗi xuất Excel: " + ex.Message);
+                }
+            }
+        }
+
+        private void BtnImportExcel_Click(object sender, EventArgs e)
+        {
+            var openDialog = new OpenFileDialog { Filter = "Excel files (*.xlsx)|*.xlsx" };
+            if (openDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    using (var workbook = new XLWorkbook(openDialog.FileName))
+                    {
+                        var ws = workbook.Worksheets.First();
+                        var rowCount = ws.LastRowUsed().RowNumber();
+                        int success = 0;
+
+                        for (int r = 2; r <= rowCount; r++)
+                        {
+                            var row = ws.Row(r);
+                            string mssv = row.Cell(1).GetString().Trim();
+                            string hoTen = row.Cell(2).GetString().Trim();
+                            if (string.IsNullOrEmpty(mssv) || string.IsNullOrEmpty(hoTen)) continue;
+
+                            string lop = row.Cell(3).GetString().Trim();
+                            string chuyenNganh = row.Cell(4).GetString().Trim();
+                            string email = row.Cell(5).GetString().Trim();
+                            string sdt = row.Cell(6).GetString().Trim();
+                            string status = row.Cell(7).GetString().Trim();
+
+                            // Tạo User
+                            string sqlUser = @"
+                        IF NOT EXISTS (SELECT 1 FROM Users WHERE Username = @Username)
+                        INSERT INTO Users (Username, FullName, Email, Phone, PasswordHash, Role, IsActive)
+                        VALUES (@Username, @FullName, @Email, @Phone, HASHBYTES('SHA2_256', @Password), 3, 1)";
+
+                            DatabaseHelper.ExecuteNonQuery(sqlUser, new SqlParameter[]
+                            {
+                        new SqlParameter("@Username", mssv),
+                        new SqlParameter("@FullName", hoTen),
+                        new SqlParameter("@Email", email ?? ""),
+                        new SqlParameter("@Phone", sdt ?? ""),
+                        new SqlParameter("@Password", mssv)
+                            });
+
+                            // SỬA DÒNG NÀY: Phải truyền mảng SqlParameter[], không được truyền 1 cái
+                            int userId = (int)DatabaseHelper.ExecuteScalar(
+                                "SELECT UserId FROM Users WHERE Username = @Username",
+                                new SqlParameter[] { new SqlParameter("@Username", mssv) }  // ← ĐÃ SỬA
+                            );
+
+                            // Thêm Student
+                            string sqlStudent = @"
+                        IF NOT EXISTS (SELECT 1 FROM Students WHERE StudentCode = @Code)
+                        INSERT INTO Students (UserId, StudentCode, Class, Major, Status)
+                        VALUES (@UserId, @Code, @Class, @Major, @Status)";
+
+                            DatabaseHelper.ExecuteNonQuery(sqlStudent, new SqlParameter[]
+                            {
+                        new SqlParameter("@UserId", userId),
+                        new SqlParameter("@Code", mssv),
+                        new SqlParameter("@Class", lop ?? ""),
+                        new SqlParameter("@Major", chuyenNganh ?? ""),
+                        new SqlParameter("@Status", string.IsNullOrEmpty(status) ? "Đang học" : status)
+                            });
+
+                            success++;
+                        }
+
+                        LoadFilters();
+                        LoadStudents();
+                        MessageBox.Show($"Nhập thành công {success} sinh viên!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Lỗi nhập Excel: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 

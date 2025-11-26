@@ -57,19 +57,21 @@ namespace StudentManagement.Forms
             this.Controls.Add(panelHeader);
 
             // Main content area
+            // Main Panel - Tăng chiều cao lên 900 để đủ chỗ
             Panel mainPanel = new Panel
             {
                 Location = new Point(30, 120),
-                Size = new Size(1320, 750),
+                Size = new Size(1320, 900),  // TĂNG LÊN 900 ĐỂ ĐỦ CHỖ
                 BackColor = Color.Transparent,
-                AutoScroll = true
+                AutoScroll = true            // BẬT SCROLL ĐỂ CUỘN XUỐNG THẤY NÚT
             };
 
+            // === PANEL TRÁI - Tăng chiều cao lên 850 ===
             // Profile Section
             panelProfile = new Panel
             {
                 Location = new Point(0, 0),
-                Size = new Size(640, 650),
+                Size = new Size(640, 850),
                 BackColor = Color.White,
                 Padding = new Padding(30)
             };
@@ -217,7 +219,7 @@ namespace StudentManagement.Forms
             {
                 Text = "💾 Lưu thông tin",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Location = new Point(450, yPos),
+                Location = new Point(440, yPos + 70),
                 Size = new Size(140, 45),
                 BackColor = Color.FromArgb(39, 174, 96),
                 ForeColor = Color.White,
@@ -230,11 +232,12 @@ namespace StudentManagement.Forms
 
             mainPanel.Controls.Add(panelProfile);
 
+            // === PANEL PHẢI - CŨNG TĂNG CAO LÊN 850 ===
             // Password Section
             panelPassword = new Panel
             {
                 Location = new Point(680, 0),
-                Size = new Size(640, 650),
+                Size = new Size(640, 850),
                 BackColor = Color.White,
                 Padding = new Padding(30)
             };

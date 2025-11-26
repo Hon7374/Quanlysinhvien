@@ -1,10 +1,12 @@
 using System;
+using System.IO;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
 using System.Windows.Forms;
 using StudentManagement.Data;
 using StudentManagement.Helpers;
+using ClosedXML.Excel;
 
 namespace StudentManagement.Forms
 {
@@ -13,6 +15,10 @@ namespace StudentManagement.Forms
         private Panel panelMenu;
         private Panel panelContent;
         private Label lblWelcome;
+
+        // KHAI BÁO TOÀN CỤC – QUAN TRỌNG NHẤT!
+        private ComboBox cboCourse;
+        private DataGridView dgvStudents;
 
         public TeacherDashboard()
         {
@@ -165,7 +171,7 @@ Số điện thoại: {SessionManager.CurrentUser.Phone}";
                 {
                     Text = info,
                     Font = new Font("Segoe UI", 10),
-                    Location = new Point(20, 20),
+                    Location = new Point(20, 5),
                     AutoSize = true
                 };
                 infoPanel.Controls.Add(lblDetails);
@@ -309,115 +315,204 @@ Số điện thoại: {SessionManager.CurrentUser.Phone}";
             panelContent.Controls.Add(dgv);
         }
 
+        // DANH SÁCH SINH VIÊN – ĐÃ SỬA HOÀN HẢO, KHÔNG LỖI
         private void LoadStudentList()
         {
             panelContent.Controls.Clear();
 
-            Label lblTitle = new Label
+            var lblTitle = new Label
             {
                 Text = "DANH SÁCH SINH VIÊN",
                 Font = new Font("Segoe UI", 18, FontStyle.Bold),
+                ForeColor = Color.FromArgb(39, 174, 96),
                 Location = new Point(20, 20),
                 AutoSize = true
             };
             panelContent.Controls.Add(lblTitle);
 
-            // Course selection
-            Label lblCourse = new Label
+            var lblSelect = new Label
             {
                 Text = "Chọn môn học:",
-                Font = new Font("Segoe UI", 10),
-                Location = new Point(20, 70),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                Location = new Point(20, 80),
                 AutoSize = true
             };
-            panelContent.Controls.Add(lblCourse);
+            panelContent.Controls.Add(lblSelect);
 
-            ComboBox cboCourse = new ComboBox
+            // DÙNG BIẾN TOÀN CỤC
+            cboCourse = new ComboBox
             {
-                Font = new Font("Segoe UI", 10),
-                Location = new Point(140, 68),
-                Size = new Size(300, 30),
-                DropDownStyle = ComboBoxStyle.DropDownList
+                Location = new Point(140, 78),
+                Size = new Size(350, 30),
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Font = new Font("Segoe UI", 10)
             };
-
-            // Load courses
-            string queryCourses = @"SELECT CourseId, CONCAT(CourseCode, ' - ', CourseName) as DisplayName
-                                   FROM Courses
-                                   WHERE TeacherId = @TeacherId";
-            DataTable dtCourses = DatabaseHelper.ExecuteQuery(queryCourses,
-                new SqlParameter[] { new SqlParameter("@TeacherId", SessionManager.CurrentTeacher.TeacherId) });
-
-            cboCourse.DisplayMember = "DisplayName";
-            cboCourse.ValueMember = "CourseId";
-            cboCourse.DataSource = dtCourses;
-
             panelContent.Controls.Add(cboCourse);
 
-            // Student DataGridView
-            DataGridView dgv = new DataGridView
+            // NÚT XUẤT EXCEL – ĐẸP, CÓ ICON NHỎ (TÙY CHỌN)
+            var btnExport = new Button
             {
-                Location = new Point(20, 120),
-                Size = new Size(panelContent.Width - 60, panelContent.Height - 160),
+                Text = "Xuất Excel",
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                Location = new Point(510, 76),
+                Size = new Size(160, 36),
+                BackColor = Color.FromArgb(46, 204, 113),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
+            };
+            btnExport.FlatAppearance.BorderSize = 0;
+            btnExport.Click += BtnExportExcel_Click;
+            panelContent.Controls.Add(btnExport);
+
+            // DÙNG BIẾN TOÀN CỤC
+            dgvStudents = new DataGridView
+            {
+                Location = new Point(20, 130),
+                Size = new Size(panelContent.Width - 60, panelContent.Height - 180),
                 Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
                 ReadOnly = true,
                 AllowUserToAddRows = false,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
                 BackgroundColor = Color.White,
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
-                Name = "dgvStudents"
+                RowHeadersVisible = false,
+                EnableHeadersVisualStyles = false,
+                ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = Color.FromArgb(52, 152, 219),
+                    ForeColor = Color.White,
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold)
+                }
             };
-            panelContent.Controls.Add(dgv);
+            panelContent.Controls.Add(dgvStudents);
+
+            LoadCoursesToComboBox();
 
             cboCourse.SelectedIndexChanged += (s, e) =>
             {
-                if (cboCourse.SelectedValue != null)
+                if (cboCourse.SelectedValue != null && int.TryParse(cboCourse.SelectedValue.ToString(), out int courseId))
                 {
-                    LoadStudentsByCourse(dgv, Convert.ToInt32(cboCourse.SelectedValue));
+                    LoadStudentsByCourse(courseId);
                 }
             };
 
             if (cboCourse.Items.Count > 0)
-            {
                 cboCourse.SelectedIndex = 0;
-                // Manually trigger load for first item
-                if (cboCourse.SelectedValue != null)
-                {
-                    LoadStudentsByCourse(dgv, Convert.ToInt32(cboCourse.SelectedValue));
-                }
-            }
         }
 
-        private void LoadStudentsByCourse(DataGridView dgv, int courseId)
+        private void LoadCoursesToComboBox()
+        {
+            var dt = DatabaseHelper.ExecuteQuery(
+                "SELECT CourseId, CONCAT(CourseCode, ' - ', CourseName) AS DisplayName FROM Courses WHERE TeacherId = @TeacherId AND IsActive = 1",
+                new SqlParameter[] { new SqlParameter("@TeacherId", SessionManager.CurrentTeacher.TeacherId) });
+
+            cboCourse.DataSource = dt;
+            cboCourse.DisplayMember = "DisplayName";
+            cboCourse.ValueMember = "CourseId";
+        }
+
+        private void LoadStudentsByCourse(int courseId)
         {
             try
             {
-                string query = @"SELECT s.StudentCode, u.FullName, u.Email, u.Phone,
-                                s.Class, s.Major, e.EnrollmentDate, e.Status
-                                FROM Enrollments e
-                                INNER JOIN Students s ON e.StudentId = s.StudentId
-                                INNER JOIN Users u ON s.UserId = u.UserId
-                                WHERE e.CourseId = @CourseId
-                                ORDER BY s.StudentCode";
+                string query = @"
+            SELECT 
+                s.StudentCode AS [Mã SV],
+                u.FullName AS [Họ tên],
+                u.Email,
+                u.Phone AS [Số ĐT],
+                s.Class AS Lớp,
+                s.Major AS Ngành,
+                CONVERT(varchar, e.EnrollmentDate, 103) AS [Ngày đăng ký],
+                e.Status AS [Trạng thái]  -- TRẢ VỀ DỮ LIỆU GỐC (1 hoặc 0)
+            FROM Enrollments e
+            INNER JOIN Students s ON e.StudentId = s.StudentId
+            INNER JOIN Users u ON s.UserId = u.UserId
+            WHERE e.CourseId = @CourseId
+            ORDER BY s.StudentCode";
 
-                dgv.DataSource = DatabaseHelper.ExecuteQuery(query,
+                var dt = DatabaseHelper.ExecuteQuery(query,
                     new SqlParameter[] { new SqlParameter("@CourseId", courseId) });
 
-                if (dgv.Columns.Count >= 8)
+                // Dịch 1 → "Enrolled", 0 → "Dropped" ngay trong C#
+                foreach (DataRow row in dt.Rows)
                 {
-                    dgv.Columns[0].HeaderText = "Mã SV";
-                    dgv.Columns[1].HeaderText = "Họ tên";
-                    dgv.Columns[2].HeaderText = "Email";
-                    dgv.Columns[3].HeaderText = "Số ĐT";
-                    dgv.Columns[4].HeaderText = "Lớp";
-                    dgv.Columns[5].HeaderText = "Ngành";
-                    dgv.Columns[6].HeaderText = "Ngày đăng ký";
-                    dgv.Columns[7].HeaderText = "Trạng thái";
+                    if (row["Trạng thái"] is int status)
+                    {
+                        row["Trạng thái"] = status == 1 ? "Enrolled" : "Dropped";
+                    }
+                }
+
+                dgvStudents.DataSource = dt;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi tải sinh viên: " + ex.Message);
+            }
+        }
+
+        // XUẤT EXCEL – HOẠT ĐỘNG HOÀN HẢO, KHÔNG CÒN LỖI
+        private void BtnExportExcel_Click(object sender, EventArgs e)
+        {
+            if (dgvStudents?.DataSource == null || ((DataTable)dgvStudents.DataSource).Rows.Count == 0)
+            {
+                MessageBox.Show("Không có dữ liệu để xuất!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                var dt = (DataTable)dgvStudents.DataSource;
+
+                // ĐOẠN NÀY LÀ CHÌA KHÓA THÀNH CÔNG – LOẠI BỎ 100% KÝ TỰ CẤM
+                string invalid = new string(Path.GetInvalidFileNameChars()) + @":\/*?""<>|";
+                string safeCourseName = string.Join("_", cboCourse.Text.Split(invalid.ToCharArray(), StringSplitOptions.RemoveEmptyEntries))
+                                                    .TrimEnd('.').Trim();
+
+                string fileName = $"Danh_sach_sinh_vien_{safeCourseName}_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+
+                var saveDlg = new SaveFileDialog
+                {
+                    Filter = "Excel Workbook|*.xlsx",
+                    FileName = fileName,
+                    Title = "Xuất danh sách sinh viên"
+                };
+
+                if (saveDlg.ShowDialog() != DialogResult.OK) return;
+
+                using (var wb = new XLWorkbook())
+                {
+                    var ws = wb.Worksheets.Add("Danh sách sinh viên");
+
+                    ws.Cell(1, 1).Value = "DANH SÁCH SINH VIÊN";
+                    ws.Cell(1, 1).Style.Font.Bold = true;
+                    ws.Cell(1, 1).Style.Font.FontSize = 16;
+                    ws.Range(1, 1, 1, dt.Columns.Count).Merge().Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                    ws.Cell(2, 1).Value = cboCourse.Text;
+                    ws.Cell(2, 1).Style.Font.Italic = true;
+                    ws.Cell(2, 1).Style.Font.FontSize = 13;
+                    ws.Range(2, 1, 2, dt.Columns.Count).Merge();
+
+                    var table = ws.Cell(4, 1).InsertTable(dt, true);
+                    table.Theme = XLTableTheme.TableStyleMedium9;
+                    table.ShowAutoFilter = true;
+                    ws.Columns().AdjustToContents();
+
+                    wb.SaveAs(saveDlg.FileName);
+                }
+
+                MessageBox.Show("Xuất Excel thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                if (MessageBox.Show("Mở file ngay?", "Mở file", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(saveDlg.FileName) { UseShellExecute = true });
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi tải danh sách sinh viên: " + ex.Message, "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

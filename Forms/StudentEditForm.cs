@@ -1,10 +1,11 @@
+using StudentManagement.Data;
+using StudentManagement.Models;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
 using System.Windows.Forms;
-using StudentManagement.Data;
-using StudentManagement.Models;
 
 namespace StudentManagement.Forms
 {
@@ -28,6 +29,14 @@ namespace StudentManagement.Forms
             this.studentId = studentId;
             InitializeComponent();
             LoadStudentData();
+            ApplyRoleBasedPermissions(); // Quan trọng: Áp dụng quyền sau khi load dữ liệu
+        }
+
+        public static class CurrentUser
+        {
+            public static int UserId { get; set; }
+            public static string Role { get; set; } // "Admin" hoặc "Student"
+                                                    // Có thể thêm FullName, StudentId, v.v.
         }
 
         private void InitializeComponent()
@@ -166,6 +175,7 @@ namespace StudentManagement.Forms
                 Font = new Font("Segoe UI", 10),
                 Location = new Point(0, yPos + 25),
                 Size = new Size(430, 30),
+                ReadOnly = true,
                 BorderStyle = BorderStyle.FixedSingle
             };
             mainPanel.Controls.Add(txtClass);
@@ -177,6 +187,7 @@ namespace StudentManagement.Forms
                 Font = new Font("Segoe UI", 10),
                 Location = new Point(470, yPos + 25),
                 Size = new Size(430, 30),
+                ReadOnly = true,
                 BorderStyle = BorderStyle.FixedSingle
             };
             mainPanel.Controls.Add(txtMajor);
@@ -335,157 +346,164 @@ namespace StudentManagement.Forms
             panel.Controls.Add(label);
         }
 
+        // ================== LOAD DỮ LIỆU ==================
         private void LoadStudentData()
         {
             try
             {
                 string query = @"
-                    SELECT
-                        s.UserId,
-                        u.FullName,
-                        s.StudentCode,
-                        s.Class,
-                        s.Major,
-                        u.Email,
-                        u.Phone,
-                        s.Address,
-                        s.Status,
-                        s.CreatedAt
+                    SELECT s.UserId, u.FullName, s.StudentCode, s.Class, s.Major,
+                           u.Email, u.Phone, s.Address, s.Status, s.CreatedAt
                     FROM Students s
                     INNER JOIN Users u ON s.UserId = u.UserId
                     WHERE s.StudentId = @StudentId";
 
-                DataTable dt = DatabaseHelper.ExecuteQuery(query,
-                    new SqlParameter[] { new SqlParameter("@StudentId", studentId) });
+                var parameters = new SqlParameter[] { new SqlParameter("@StudentId", studentId) };
+                DataTable dt = DatabaseHelper.ExecuteQuery(query, parameters);
 
                 if (dt.Rows.Count > 0)
                 {
-                    DataRow row = dt.Rows[0];
+                    DataRow r = dt.Rows[0];
+                    userId = Convert.ToInt32(r["UserId"]);
 
-                    userId = Convert.ToInt32(row["UserId"]);
-                    txtFullName.Text = row["FullName"].ToString();
-                    txtStudentCode.Text = row["StudentCode"].ToString();
-                    txtClass.Text = row["Class"].ToString();
-                    txtMajor.Text = row["Major"].ToString();
-                    txtEmail.Text = row["Email"].ToString();
-                    txtPhone.Text = row["Phone"].ToString();
-                    txtAddress.Text = row["Address"].ToString();
+                    txtFullName.Text = r["FullName"].ToString();
+                    txtStudentCode.Text = r["StudentCode"].ToString();
+                    txtClass.Text = r["Class"].ToString();
+                    txtMajor.Text = r["Major"].ToString();
+                    txtEmail.Text = r["Email"].ToString();
+                    txtPhone.Text = r["Phone"].ToString();
+                    txtAddress.Text = r["Address"].ToString();
 
-                    string status = row["Status"].ToString();
-                    cboStatus.SelectedItem = status;
-                    if (cboStatus.SelectedIndex == -1 && cboStatus.Items.Count > 0)
-                    {
-                        cboStatus.SelectedIndex = 0;
-                    }
+                    cboStatus.SelectedItem = r["Status"].ToString();
+                    if (cboStatus.SelectedIndex == -1) cboStatus.SelectedIndex = 0;
 
-                    if (row["CreatedAt"] != DBNull.Value)
-                    {
-                        lblCreatedDate.Text = Convert.ToDateTime(row["CreatedAt"]).ToString("yyyy-MM-dd HH:mm:ss");
-                    }
-                    else
-                    {
-                        lblCreatedDate.Text = "N/A";
-                    }
+                    lblCreatedDate.Text = r["CreatedAt"] == DBNull.Value
+                        ? "N/A"
+                        : Convert.ToDateTime(r["CreatedAt"]).ToString("dd/MM/yyyy HH:mm");
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi khi tải thông tin sinh viên: {ex.Message}", "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi tải dữ liệu: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
+        // ================== KHÓA CHẶT TEXTBOX ==================
+        private void LockField(TextBox txt)
+        {
+            if (txt == null) return;
+            txt.ReadOnly = true;
+            txt.TabStop = false;
+            txt.BackColor = Color.FromArgb(243, 244, 246);
+            txt.Cursor = Cursors.Default;
+
+            txt.Enter += (s, e) => txt.Parent.Focus();
+            txt.MouseDown += (s, e) => txt.Parent.Focus();
+            txt.MouseClick += (s, e) => txt.Parent.Focus();
+        }
+
+        // ================== ÁP DỤNG QUYỀN ==================
+        private void ApplyRoleBasedPermissions()
+        {
+            bool isAdmin = CurrentUser.Role?.Equals("Admin", StringComparison.OrdinalIgnoreCase) == true;
+
+            if (!isAdmin)
+            {
+                LockField(txtClass);
+                LockField(txtMajor);
+            }
+            else
+            {
+                txtClass.ReadOnly = false;
+                txtMajor.ReadOnly = false;
+                txtClass.BackColor = Color.White;
+                txtMajor.BackColor = Color.White;
+                txtClass.TabStop = true;
+                txtMajor.TabStop = true;
+            }
+
+            btnDownload.Visible = isAdmin;
+        }
+
+        // ──────────────────────────────────────────────────────────────
+        // LƯU DỮ LIỆU – SINH VIÊN KHÔNG ĐƯỢC PHÉP SỬA LỚP & NGÀNH TRONG DB
+        // ──────────────────────────────────────────────────────────────
         private void BtnSave_Click(object sender, EventArgs e)
         {
             try
             {
-                // Validation
-                if (string.IsNullOrWhiteSpace(txtFullName.Text))
+                if (string.IsNullOrWhiteSpace(txtFullName.Text.Trim()))
                 {
-                    MessageBox.Show("Vui lòng nhập họ tên sinh viên!", "Thông báo",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    txtFullName.Focus();
+                    MessageBox.Show("Vui lòng nhập họ tên!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+                if (string.IsNullOrWhiteSpace(txtEmail.Text.Trim()))
+                {
+                    MessageBox.Show("Vui lòng nhập email!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
-                if (string.IsNullOrWhiteSpace(txtEmail.Text))
+                // Kiểm tra email trùng
+                string checkSql = "SELECT COUNT(*) FROM Users WHERE Email = @Email AND UserId <> @UserId";
+                var checkParams = new SqlParameter[]
                 {
-                    MessageBox.Show("Vui lòng nhập email!", "Thông báo",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    txtEmail.Focus();
+                    new SqlParameter("@Email", txtEmail.Text.Trim()),
+                    new SqlParameter("@UserId", userId)
+                };
+                int count = (int)DatabaseHelper.ExecuteScalar(checkSql, checkParams);
+
+                if (count > 0)
+                {
+                    MessageBox.Show("Email đã được sử dụng!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
-                // Check if email already exists (excluding current user)
-                string checkEmailQuery = "SELECT COUNT(*) FROM Users WHERE Email = @Email AND UserId != @UserId";
-                int emailCount = Convert.ToInt32(DatabaseHelper.ExecuteScalar(checkEmailQuery,
-                    new SqlParameter[] {
-                        new SqlParameter("@Email", txtEmail.Text.Trim()),
-                        new SqlParameter("@UserId", userId)
-                    }));
-
-                if (emailCount > 0)
-                {
-                    MessageBox.Show("Email đã tồn tại! Vui lòng nhập email khác.", "Thông báo",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    txtEmail.Focus();
-                    txtEmail.SelectAll();
-                    return;
-                }
-
-                // Update User
-                string updateUserQuery = @"UPDATE Users SET
-                    FullName = @FullName,
-                    Email = @Email,
-                    Phone = @Phone
-                    WHERE UserId = @UserId";
-
-                SqlParameter[] userParams = new SqlParameter[]
+                // Cập nhật Users
+                string updateUser = "UPDATE Users SET FullName=@FullName, Email=@Email, Phone=@Phone WHERE UserId=@UserId";
+                var userParams = new SqlParameter[]
                 {
                     new SqlParameter("@FullName", txtFullName.Text.Trim()),
                     new SqlParameter("@Email", txtEmail.Text.Trim()),
-                    new SqlParameter("@Phone", txtPhone.Text.Trim()),
+                    new SqlParameter("@Phone", txtPhone.Text.Trim() ?? ""),
                     new SqlParameter("@UserId", userId)
                 };
+                DatabaseHelper.ExecuteNonQuery(updateUser, userParams);
 
-                DatabaseHelper.ExecuteNonQuery(updateUserQuery, userParams);
+                // Cập nhật Students – chỉ Admin mới được sửa Lớp & Ngành
+                bool isAdmin = CurrentUser.Role?.Equals("Admin", StringComparison.OrdinalIgnoreCase) == true;
 
-                // Update Student
-                string updateStudentQuery = @"UPDATE Students SET
-                    Class = @Class,
-                    Major = @Major,
-                    Address = @Address,
-                    Status = @Status
-                    WHERE StudentId = @StudentId";
+                string updateStudentSql = isAdmin
+                    ? "UPDATE Students SET Class=@Class, Major=@Major, Address=@Address, Status=@Status WHERE StudentId=@StudentId"
+                    : "UPDATE Students SET Address=@Address, Status=@Status WHERE StudentId=@StudentId";
 
-                SqlParameter[] studentParams = new SqlParameter[]
+                var studentParams = new List<SqlParameter>
                 {
-                    new SqlParameter("@Class", txtClass.Text.Trim()),
-                    new SqlParameter("@Major", txtMajor.Text.Trim()),
                     new SqlParameter("@Address", txtAddress.Text.Trim()),
-                    new SqlParameter("@Status", cboStatus.SelectedItem.ToString()),
+                    new SqlParameter("@Status", cboStatus.SelectedItem?.ToString() ?? "Đang học"),
                     new SqlParameter("@StudentId", studentId)
                 };
 
-                DatabaseHelper.ExecuteNonQuery(updateStudentQuery, studentParams);
+                if (isAdmin)
+                {
+                    studentParams.Add(new SqlParameter("@Class", txtClass.Text.Trim()));
+                    studentParams.Add(new SqlParameter("@Major", txtMajor.Text.Trim()));
+                }
 
-                MessageBox.Show("Cập nhật thông tin sinh viên thành công!", "Thành công",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                DatabaseHelper.ExecuteNonQuery(updateStudentSql, studentParams.ToArray());
 
+                MessageBox.Show("Cập nhật thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 this.DialogResult = DialogResult.OK;
                 this.Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Lỗi khi cập nhật thông tin sinh viên: {ex.Message}", "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void BtnDownload_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Chức năng tải xuống sẽ được triển khai sau!", "Thông báo",
-                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Tính năng đang phát triển!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

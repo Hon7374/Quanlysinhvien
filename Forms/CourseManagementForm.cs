@@ -1,10 +1,14 @@
-using System;
-using System.Data;
-using System.Data.SqlClient;
-using System.Drawing;
-using System.Windows.Forms;
+using System.Linq;  // THÊM DÒNG NÀY VÀO ĐẦU FILE
+using ClosedXML.Excel;
 using StudentManagement.Data;
 using StudentManagement.Models;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Diagnostics;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace StudentManagement.Forms
 {
@@ -127,7 +131,7 @@ namespace StudentManagement.Forms
                 Location = new Point(450, 25),
                 Size = new Size(180, 35),
                 DropDownStyle = ComboBoxStyle.DropDownList,
-                FlatStyle = FlatStyle.Flat
+                FlatStyle = FlatStyle.Standard
             };
             cboSemester.SelectedIndexChanged += Filter_Changed;
             panelFilters.Controls.Add(cboSemester);
@@ -149,12 +153,43 @@ namespace StudentManagement.Forms
                 Location = new Point(650, 25),
                 Size = new Size(180, 35),
                 DropDownStyle = ComboBoxStyle.DropDownList,
-                FlatStyle = FlatStyle.Flat
+                FlatStyle = FlatStyle.Standard
             };
             cboStatus.Items.AddRange(new object[] { "Tất cả", "Đang mở", "Đã đóng" });
             cboStatus.SelectedIndex = 0;
             cboStatus.SelectedIndexChanged += Filter_Changed;
             panelFilters.Controls.Add(cboStatus);
+
+            // Upload/Download Buttons
+            Button btnUpload = new Button
+            {
+                Text = "⬆ Tải lên",
+                Font = new Font("Segoe UI", 10),
+                Location = new Point(950, 50),
+                Size = new Size(120, 45),
+                BackColor = Color.White,
+                ForeColor = Color.FromArgb(107, 114, 128),
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
+            };
+            btnUpload.FlatAppearance.BorderColor = Color.FromArgb(99, 102, 241);
+            btnUpload.Click += BtnImportExcel_Click;  // ← THÊM DÒNG NÀY
+            panelHeader.Controls.Add(btnUpload);
+
+            Button btnDownload = new Button
+            {
+                Text = "⬇ Tải xuống",
+                Font = new Font("Segoe UI", 10),
+                Location = new Point(1100, 50),
+                Size = new Size(130, 45),
+                BackColor = Color.White,
+                ForeColor = Color.FromArgb(107, 114, 128),
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
+            };
+            btnDownload.FlatAppearance.BorderColor = Color.FromArgb(99, 102, 241);
+            btnDownload.Click += BtnExportExcel_Click;  // ← THÊM DÒNG NÀY
+            panelHeader.Controls.Add(btnDownload);
 
             // Content Panel
             panelContent = new Panel
@@ -165,11 +200,16 @@ namespace StudentManagement.Forms
                 AutoScroll = true
             };
 
+            panelContent.HorizontalScroll.Enabled = false;
+            panelContent.HorizontalScroll.Visible = false;
+            panelContent.HorizontalScroll.Maximum = 0;
+            panelContent.AutoScrollMinSize = new Size(0, 1000); // đảm bảo có chỗ cuộn dọc
+
             // DataGridView for Courses
             dgvCourses = new DataGridView
             {
                 Location = new Point(0, 20),
-                Size = new Size(1320, 650),
+                Size = new Size(1270, 650),
                 ReadOnly = true,
                 AllowUserToAddRows = false,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
@@ -331,7 +371,7 @@ namespace StudentManagement.Forms
                             HeaderText = "TRẠNG THÁI",
                             UseColumnTextForButtonValue = false,
                             FlatStyle = FlatStyle.Flat,
-                            Width = 100,
+                            Width = 120,
                             AutoSizeMode = DataGridViewAutoSizeColumnMode.None
                         };
                         dgvCourses.Columns.Add(statusCol);
@@ -343,11 +383,11 @@ namespace StudentManagement.Forms
                         DataGridViewButtonColumn viewCol = new DataGridViewButtonColumn
                         {
                             Name = "View",
-                            HeaderText = "HÀNH ĐỘNG",
+                            HeaderText = "",
                             Text = "👁",
                             UseColumnTextForButtonValue = true,
                             FlatStyle = FlatStyle.Flat,
-                            Width = 60,
+                            Width = 70,
                             AutoSizeMode = DataGridViewAutoSizeColumnMode.None
                         };
                         dgvCourses.Columns.Add(viewCol);
@@ -358,10 +398,11 @@ namespace StudentManagement.Forms
                         DataGridViewButtonColumn editCol = new DataGridViewButtonColumn
                         {
                             Name = "Edit",
+                            HeaderText = "",
                             Text = "✏️",
                             UseColumnTextForButtonValue = true,
                             FlatStyle = FlatStyle.Flat,
-                            Width = 60,
+                            Width = 70,
                             AutoSizeMode = DataGridViewAutoSizeColumnMode.None
                         };
                         dgvCourses.Columns.Add(editCol);
@@ -372,10 +413,11 @@ namespace StudentManagement.Forms
                         DataGridViewButtonColumn deleteCol = new DataGridViewButtonColumn
                         {
                             Name = "Delete",
+                            HeaderText = "",
                             Text = "🗑️",
                             UseColumnTextForButtonValue = true,
                             FlatStyle = FlatStyle.Flat,
-                            Width = 60,
+                            Width = 70,
                             AutoSizeMode = DataGridViewAutoSizeColumnMode.None
                         };
                         dgvCourses.Columns.Add(deleteCol);
@@ -400,6 +442,178 @@ namespace StudentManagement.Forms
             }
         }
 
+        // ==================== EXPORT EXCEL ====================
+        private void BtnExportExcel_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                SaveFileDialog saveDlg = new SaveFileDialog
+                {
+                    Filter = "Excel Workbook|*.xlsx",
+                    FileName = $"Danh_sach_mon_hoc_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx"
+                };
+
+                if (saveDlg.ShowDialog() == DialogResult.OK)
+                {
+                    using (var workbook = new XLWorkbook())
+                    {
+                        var ws = workbook.Worksheets.Add("Môn học");
+
+                        // Header
+                        string[] headers = { "Mã môn học", "Tên môn học", "Tín chỉ", "Học kỳ", "Giảng viên", "Sĩ số tối đa", "Trạng thái" };
+                        for (int i = 0; i < headers.Length; i++)
+                            ws.Cell(1, i + 1).Value = headers[i];
+
+                        var headerRange = ws.Range("A1:G1");
+                        headerRange.Style.Font.Bold = true;
+                        headerRange.Style.Fill.BackgroundColor = XLColor.FromArgb(99, 102, 241);
+                        headerRange.Style.Font.FontColor = XLColor.White;
+                        headerRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                        // Data
+                        string query = @"
+                            SELECT c.CourseCode, c.CourseName, c.Credits, c.Semester,
+                                   ISNULL(u.FullName, N'Chưa phân công') AS TeacherName,
+                                   c.MaxStudents,
+                                   CASE WHEN c.IsActive = 1 THEN N'Đang mở' ELSE N'Đã đóng' END
+                            FROM Courses c
+                            LEFT JOIN Teachers t ON c.TeacherId = t.TeacherId
+                            LEFT JOIN Users u ON t.UserId = u.UserId
+                            ORDER BY c.CourseCode";
+
+                        DataTable dt = DatabaseHelper.ExecuteQuery(query);
+
+                        for (int i = 0; i < dt.Rows.Count; i++)
+                        {
+                            for (int j = 0; j < dt.Columns.Count; j++)
+                            {
+                                ws.Cell(i + 2, j + 1).Value = dt.Rows[i][j]?.ToString() ?? "";
+                            }
+                        }
+
+                        ws.Columns().AdjustToContents();
+                        workbook.SaveAs(saveDlg.FileName);
+                    }
+
+                    MessageBox.Show("Xuất danh sách môn học thành công!", "Thành công",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    System.Diagnostics.Process.Start(new ProcessStartInfo(saveDlg.FileName) { UseShellExecute = true });
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi xuất Excel: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // ==================== IMPORT EXCEL ====================
+        private void BtnImportExcel_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                OpenFileDialog openDlg = new OpenFileDialog
+                {
+                    Filter = "Excel Workbook|*.xlsx",
+                    Title = "Chọn file Excel chứa danh sách môn học"
+                };
+
+                if (openDlg.ShowDialog() == DialogResult.OK)
+                {
+                    using (var workbook = new XLWorkbook(openDlg.FileName))
+                    {
+                        var ws = workbook.Worksheets.First();
+                        int rowCount = ws.LastRowUsed().RowNumber();
+                        if (rowCount < 2)
+                        {
+                            MessageBox.Show("File Excel không có dữ liệu!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            return;
+                        }
+
+                        List<string> errors = new List<string>();
+                        int success = 0;
+
+                        for (int row = 2; row <= rowCount; row++)
+                        {
+                            try
+                            {
+                                string maMon = ws.Cell(row, 1).GetString().Trim();
+                                string tenMon = ws.Cell(row, 2).GetString().Trim();
+                                string tinChiStr = ws.Cell(row, 3).GetString().Trim();
+                                string hocKy = ws.Cell(row, 4).GetString().Trim();
+                                string siSoStr = ws.Cell(row, 6).GetString().Trim();
+                                string trangThai = ws.Cell(row, 7).GetString().Trim();
+
+                                if (string.IsNullOrWhiteSpace(maMon) || string.IsNullOrWhiteSpace(tenMon))
+                                {
+                                    errors.Add($"Dòng {row}: Thiếu mã hoặc tên môn học");
+                                    continue;
+                                }
+
+                                if (!int.TryParse(tinChiStr, out int tinChi) || tinChi <= 0)
+                                {
+                                    errors.Add($"Dòng {row}: Số tín chỉ không hợp lệ");
+                                    continue;
+                                }
+
+                                if (!int.TryParse(siSoStr, out int siSo) || siSo <= 0)
+                                    siSo = 50; // mặc định
+
+                                bool isActive = trangThai.Contains("mở") || string.IsNullOrWhiteSpace(trangThai);
+
+                                // Kiểm tra trùng mã môn học
+                                int count = (int)DatabaseHelper.ExecuteScalar(
+                                    "SELECT COUNT(*) FROM Courses WHERE CourseCode = @code",
+                                    new SqlParameter[] { new SqlParameter("@code", maMon) });
+
+                                if (count > 0)
+                                {
+                                    errors.Add($"Dòng {row}: Mã môn học '{maMon}' đã tồn tại");
+                                    continue;
+                                }
+
+                                // Insert môn học (TeacherId để NULL tạm)
+                                string insertSql = @"
+                                    INSERT INTO Courses (CourseCode, CourseName, Credits, Semester, MaxStudents, IsActive, Description)
+                                    VALUES (@Code, @Name, @Credits, @Semester, @MaxStudents, @IsActive, @Desc)";
+
+                                DatabaseHelper.ExecuteNonQuery(insertSql,
+                                    new SqlParameter[] {
+                                        new SqlParameter("@Code", maMon),
+                                        new SqlParameter("@Name", tenMon),
+                                        new SqlParameter("@Credits", tinChi),
+                                        new SqlParameter("@Semester", string.IsNullOrWhiteSpace(hocKy) ? DBNull.Value : hocKy),
+                                        new SqlParameter("@MaxStudents", siSo),
+                                        new SqlParameter("@IsActive", isActive ? 1 : 0),
+                                        new SqlParameter("@Desc", "Nhập từ Excel")
+                                    });
+
+                                success++;
+                            }
+                            catch (Exception ex)
+                            {
+                                errors.Add($"Dòng {row}: {ex.Message}");
+                            }
+                        }
+
+                        LoadFilters();
+                        LoadCourses();
+
+                        string msg = $"Nhập thành công {success} môn học.";
+                        if (errors.Count > 0)
+                            msg += $"\n\nLỗi ({errors.Count} dòng):\n" + string.Join("\n", errors.Take(10));
+
+                        MessageBox.Show(msg, "Kết quả nhập Excel",
+                            MessageBoxButtons.OK,
+                            errors.Count > 0 ? MessageBoxIcon.Warning : MessageBoxIcon.Information);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi nhập file Excel: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
         private void DgvCourses_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
             if (e.RowIndex >= 0 && e.ColumnIndex >= 0 && dgvCourses.Columns[e.ColumnIndex].Name == "StatusBadge")
@@ -567,15 +781,15 @@ namespace StudentManagement.Forms
 
                 // Set column widths proportionally
                 if (dgvCourses.Columns.Contains("Mã môn học") && dgvCourses.Columns["Mã môn học"] != null)
-                    dgvCourses.Columns["Mã môn học"].Width = (int)(availableWidth * 0.15);
+                    dgvCourses.Columns["Mã môn học"].Width = (int)(availableWidth * 0.10);
                 if (dgvCourses.Columns.Contains("Tên môn học") && dgvCourses.Columns["Tên môn học"] != null)
-                    dgvCourses.Columns["Tên môn học"].Width = (int)(availableWidth * 0.30);
+                    dgvCourses.Columns["Tên môn học"].Width = (int)(availableWidth * 0.25);
                 if (dgvCourses.Columns.Contains("Tín chỉ") && dgvCourses.Columns["Tín chỉ"] != null)
                     dgvCourses.Columns["Tín chỉ"].Width = (int)(availableWidth * 0.10);
                 if (dgvCourses.Columns.Contains("Học kỳ") && dgvCourses.Columns["Học kỳ"] != null)
-                    dgvCourses.Columns["Học kỳ"].Width = (int)(availableWidth * 0.15);
+                    dgvCourses.Columns["Học kỳ"].Width = (int)(availableWidth * 0.13);
                 if (dgvCourses.Columns.Contains("Giảng viên") && dgvCourses.Columns["Giảng viên"] != null)
-                    dgvCourses.Columns["Giảng viên"].Width = (int)(availableWidth * 0.20);
+                    dgvCourses.Columns["Giảng viên"].Width = (int)(availableWidth * 0.25);
                 if (dgvCourses.Columns.Contains("Sĩ số tối đa") && dgvCourses.Columns["Sĩ số tối đa"] != null)
                     dgvCourses.Columns["Sĩ số tối đa"].Width = (int)(availableWidth * 0.10);
             }

@@ -24,3 +24,42 @@ C:\Users\phuy1\Documents\QuanLySinhVien\obj\Debug\net6.0-windows\StudentManageme
 C:\Users\phuy1\Documents\QuanLySinhVien\obj\Debug\net6.0-windows\StudentManagement.genruntimeconfig.cache
 C:\Users\phuy1\Documents\QuanLySinhVien\obj\Debug\net6.0-windows\ref\StudentManagement.dll
 c:\Users\phuy1\Documents\QuanLySinhVien\obj\Debug\net6.0-windows\StudentManagement.sourcelink.json
+C:\Users\Acer\Downloads\New folder (2)\bin\Debug\net6.0-windows\StudentManagement.exe
+C:\Users\Acer\Downloads\New folder (2)\bin\Debug\net6.0-windows\StudentManagement.dll.config
+C:\Users\Acer\Downloads\New folder (2)\bin\Debug\net6.0-windows\StudentManagement.deps.json
+C:\Users\Acer\Downloads\New folder (2)\bin\Debug\net6.0-windows\StudentManagement.runtimeconfig.json
+C:\Users\Acer\Downloads\New folder (2)\bin\Debug\net6.0-windows\StudentManagement.dll
+C:\Users\Acer\Downloads\New folder (2)\bin\Debug\net6.0-windows\StudentManagement.pdb
+C:\Users\Acer\Downloads\New folder (2)\bin\Debug\net6.0-windows\System.Configuration.ConfigurationManager.dll
+C:\Users\Acer\Downloads\New folder (2)\bin\Debug\net6.0-windows\System.Data.SqlClient.dll
+C:\Users\Acer\Downloads\New folder (2)\bin\Debug\net6.0-windows\System.Security.Cryptography.ProtectedData.dll
+C:\Users\Acer\Downloads\New folder (2)\bin\Debug\net6.0-windows\runtimes\win-arm64\native\sni.dll
+C:\Users\Acer\Downloads\New folder (2)\bin\Debug\net6.0-windows\runtimes\win-x64\native\sni.dll
+C:\Users\Acer\Downloads\New folder (2)\bin\Debug\net6.0-windows\runtimes\win-x86\native\sni.dll
+C:\Users\Acer\Downloads\New folder (2)\bin\Debug\net6.0-windows\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll
+C:\Users\Acer\Downloads\New folder (2)\bin\Debug\net6.0-windows\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
+C:\Users\Acer\Downloads\New folder (2)\obj\Debug\net6.0-windows\StudentManagement.csproj.AssemblyReference.cache
+C:\Users\Acer\Downloads\New folder (2)\obj\Debug\net6.0-windows\StudentManagement.Forms.GradeEntryForm.resources
+C:\Users\Acer\Downloads\New folder (2)\obj\Debug\net6.0-windows\StudentManagement.Forms.GradeViewForm.resources
+C:\Users\Acer\Downloads\New folder (2)\obj\Debug\net6.0-windows\StudentManagement.Forms.StudentManagementForm.resources
+C:\Users\Acer\Downloads\New folder (2)\obj\Debug\net6.0-windows\StudentManagement.Forms.UserManagementForm.resources
+C:\Users\Acer\Downloads\New folder (2)\obj\Debug\net6.0-windows\StudentManagement.csproj.GenerateResource.cache
+C:\Users\Acer\Downloads\New folder (2)\obj\Debug\net6.0-windows\StudentManagement.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Acer\Downloads\New folder (2)\obj\Debug\net6.0-windows\StudentManagement.AssemblyInfoInputs.cache
+C:\Users\Acer\Downloads\New folder (2)\obj\Debug\net6.0-windows\StudentManagement.AssemblyInfo.cs
+C:\Users\Acer\Downloads\New folder (2)\obj\Debug\net6.0-windows\StudentManagement.csproj.CoreCompileInputs.cache
+C:\Users\Acer\Downloads\New folder (2)\obj\Debug\net6.0-windows\StudentManagement.sourcelink.json
+C:\Users\Acer\Downloads\New folder (2)\obj\Debug\net6.0-windows\StudentM.FBDC7194.Up2Date
+C:\Users\Acer\Downloads\New folder (2)\obj\Debug\net6.0-windows\StudentManagement.dll
+C:\Users\Acer\Downloads\New folder (2)\obj\Debug\net6.0-windows\refint\StudentManagement.dll
+C:\Users\Acer\Downloads\New folder (2)\obj\Debug\net6.0-windows\StudentManagement.pdb
+C:\Users\Acer\Downloads\New folder (2)\obj\Debug\net6.0-windows\StudentManagement.genruntimeconfig.cache
+C:\Users\Acer\Downloads\New folder (2)\obj\Debug\net6.0-windows\ref\StudentManagement.dll
+C:\Users\Acer\Downloads\New folder (2)\bin\Debug\net6.0-windows\ClosedXML.dll
+C:\Users\Acer\Downloads\New folder (2)\bin\Debug\net6.0-windows\ClosedXML.Parser.dll
+C:\Users\Acer\Downloads\New folder (2)\bin\Debug\net6.0-windows\DocumentFormat.OpenXml.dll
+C:\Users\Acer\Downloads\New folder (2)\bin\Debug\net6.0-windows\DocumentFormat.OpenXml.Framework.dll
+C:\Users\Acer\Downloads\New folder (2)\bin\Debug\net6.0-windows\ExcelNumberFormat.dll
+C:\Users\Acer\Downloads\New folder (2)\bin\Debug\net6.0-windows\RBush.dll
+C:\Users\Acer\Downloads\New folder (2)\bin\Debug\net6.0-windows\SixLabors.Fonts.dll
+C:\Users\Acer\Downloads\New folder (2)\bin\Debug\net6.0-windows\System.IO.Packaging.dll

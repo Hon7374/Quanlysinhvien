@@ -1,9 +1,13 @@
+using ClosedXML.Excel;
+using StudentManagement.Data;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.IO;
+using System.Linq;
 using System.Windows.Forms;
-using StudentManagement.Data;
 
 namespace StudentManagement.Forms
 {
@@ -69,28 +73,30 @@ namespace StudentManagement.Forms
             {
                 Text = "⬆ Tải lên",
                 Font = new Font("Segoe UI", 10),
-                Location = new Point(1050, 100),
+                Location = new Point(950, 100),
                 Size = new Size(120, 45),
                 BackColor = Color.White,
                 ForeColor = Color.FromArgb(107, 114, 128),
                 FlatStyle = FlatStyle.Flat,
                 Cursor = Cursors.Hand
             };
-            btnUpload.FlatAppearance.BorderColor = Color.FromArgb(209, 213, 219);
+            btnUpload.FlatAppearance.BorderColor = Color.FromArgb(99, 102, 241);
+            btnUpload.Click += BtnImportExcel_Click;  // ← THÊM DÒNG NÀY
             panelHeader.Controls.Add(btnUpload);
 
             Button btnDownload = new Button
             {
                 Text = "⬇ Tải xuống",
                 Font = new Font("Segoe UI", 10),
-                Location = new Point(1190, 100),
+                Location = new Point(1100, 100),
                 Size = new Size(130, 45),
                 BackColor = Color.White,
                 ForeColor = Color.FromArgb(107, 114, 128),
                 FlatStyle = FlatStyle.Flat,
                 Cursor = Cursors.Hand
             };
-            btnDownload.FlatAppearance.BorderColor = Color.FromArgb(209, 213, 219);
+            btnDownload.FlatAppearance.BorderColor = Color.FromArgb(99, 102, 241);
+            btnDownload.Click += BtnExportExcel_Click;  // ← THÊM DÒNG NÀY
             panelHeader.Controls.Add(btnDownload);
 
             // Content Panel
@@ -102,10 +108,15 @@ namespace StudentManagement.Forms
                 AutoScroll = true
             };
 
+            panelContent.HorizontalScroll.Enabled = false;
+            panelContent.HorizontalScroll.Visible = false;
+            panelContent.HorizontalScroll.Maximum = 0;
+            panelContent.AutoScrollMinSize = new Size(0, 1000); // đảm bảo có chỗ cuộn dọc
+
             // Search Box
             Panel searchBg = new Panel
             {
-                Location = new Point(0, 10),
+                Location = new Point(10, 2),
                 Size = new Size(350, 45),
                 BackColor = Color.FromArgb(249, 250, 251)
             };
@@ -113,17 +124,18 @@ namespace StudentManagement.Forms
             txtSearch = new TextBox
             {
                 Font = new Font("Segoe UI", 10),
-                Location = new Point(40, 12),
+                Location = new Point(50, 10),
                 Size = new Size(300, 30),
                 BorderStyle = BorderStyle.None,
-                BackColor = Color.FromArgb(249, 250, 251)
+                BackColor = Color.FromArgb(249, 250, 251),
+                PlaceholderText = "Tìm kiếm học kỳ"
             };
             txtSearch.TextChanged += TxtSearch_TextChanged;
 
             Label lblSearchIcon = new Label
             {
                 Text = "🔍",
-                Location = new Point(10, 12),
+                Location = new Point(10, 10),
                 AutoSize = true,
                 Font = new Font("Segoe UI", 12),
                 ForeColor = Color.FromArgb(156, 163, 175)
@@ -137,7 +149,7 @@ namespace StudentManagement.Forms
             dgvSemesters = new DataGridView
             {
                 Location = new Point(0, 70),
-                Size = new Size(1320, 600),
+                Size = new Size(1250, 600),
                 ReadOnly = true,
                 AllowUserToAddRows = false,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
@@ -147,6 +159,7 @@ namespace StudentManagement.Forms
                 RowHeadersVisible = false,
                 ColumnHeadersHeight = 50,
                 RowTemplate = { Height = 60 },
+                ScrollBars = ScrollBars.Vertical,
                 ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
                 {
                     BackColor = Color.FromArgb(249, 250, 251),
@@ -244,7 +257,7 @@ namespace StudentManagement.Forms
                             Text = "✏️",
                             UseColumnTextForButtonValue = true,
                             FlatStyle = FlatStyle.Flat,
-                            Width = 80
+                            Width = 20
                         };
                         dgvSemesters.Columns.Add(editCol);
                     }
@@ -257,7 +270,7 @@ namespace StudentManagement.Forms
                             Text = "🗑️",
                             UseColumnTextForButtonValue = true,
                             FlatStyle = FlatStyle.Flat,
-                            Width = 80
+                            Width = 20
                         };
                         dgvSemesters.Columns.Add(deleteCol);
                     }
@@ -286,6 +299,161 @@ namespace StudentManagement.Forms
             (N'Học kỳ 2 (2024-2025)', 'HK2_2425', 2025, '2025-01-20', '2025-05-23', N'Sắp tới')";
 
             DatabaseHelper.ExecuteNonQuery(insertQuery);
+        }
+
+        // ==================== EXPORT EXCEL ====================
+        private void BtnExportExcel_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                SaveFileDialog saveDlg = new SaveFileDialog
+                {
+                    Filter = "Excel Workbook|*.xlsx",
+                    FileName = $"Danh_sach_hoc_ky_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx"
+                };
+
+                if (saveDlg.ShowDialog() == DialogResult.OK)
+                {
+                    using (var workbook = new XLWorkbook())
+                    {
+                        var ws = workbook.Worksheets.Add("Học kỳ");
+
+                        ws.Cell(1, 1).Value = "Tên học kỳ";
+                        ws.Cell(1, 2).Value = "Mã học kỳ";
+                        ws.Cell(1, 3).Value = "Ngày bắt đầu";
+                        ws.Cell(1, 4).Value = "Ngày kết thúc";
+                        ws.Cell(1, 5).Value = "Trạng thái";
+
+                        var header = ws.Range("A1:E1");
+                        header.Style.Font.Bold = true;
+                        header.Style.Fill.BackgroundColor = XLColor.FromArgb(79, 70, 229);
+                        header.Style.Font.FontColor = XLColor.White;
+                        header.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                        string query = "SELECT SemesterName, SemesterCode, CONVERT(varchar, StartDate, 23), CONVERT(varchar, EndDate, 23), Status FROM Semesters ORDER BY StartDate DESC";
+                        DataTable dt = DatabaseHelper.ExecuteQuery(query);
+
+                        for (int i = 0; i < dt.Rows.Count; i++)
+                        {
+                            ws.Cell(i + 2, 1).Value = dt.Rows[i][0].ToString();
+                            ws.Cell(i + 2, 2).Value = dt.Rows[i][1].ToString();
+                            ws.Cell(i + 2, 3).Value = dt.Rows[i][2].ToString();
+                            ws.Cell(i + 2, 4).Value = dt.Rows[i][3].ToString();
+                            ws.Cell(i + 2, 5).Value = dt.Rows[i][4].ToString();
+                        }
+
+                        ws.Columns().AdjustToContents();
+                        workbook.SaveAs(saveDlg.FileName);
+                    }
+
+                    MessageBox.Show("Xuất file Excel thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(saveDlg.FileName) { UseShellExecute = true });
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi xuất Excel: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // ==================== IMPORT EXCEL ====================
+        private void BtnImportExcel_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                OpenFileDialog openDlg = new OpenFileDialog
+                {
+                    Filter = "Excel Workbook|*.xlsx",
+                    Title = "Chọn file Excel để nhập"
+                };
+
+                if (openDlg.ShowDialog() == DialogResult.OK)
+                {
+                    using (var workbook = new XLWorkbook(openDlg.FileName))
+                    {
+                        var ws = workbook.Worksheets.First();
+                        int rowCount = ws.LastRowUsed().RowNumber();
+                        if (rowCount < 2)
+                        {
+                            MessageBox.Show("File không có dữ liệu!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            return;
+                        }
+
+                        List<string> errors = new List<string>();
+                        int success = 0;
+
+                        for (int row = 2; row <= rowCount; row++)
+                        {
+                            string ten = ws.Cell(row, 1).GetString().Trim();
+                            string ma = ws.Cell(row, 2).GetString().Trim();
+                            string startStr = ws.Cell(row, 3).GetString().Trim();
+                            string endStr = ws.Cell(row, 4).GetString().Trim();
+                            string status = ws.Cell(row, 5).GetString().Trim();
+
+                            if (string.IsNullOrWhiteSpace(ten) || string.IsNullOrWhiteSpace(ma))
+                            {
+                                errors.Add($"Dòng {row}: Thiếu tên hoặc mã học kỳ");
+                                continue;
+                            }
+
+                            if (!DateTime.TryParse(startStr, out DateTime startDate))
+                            {
+                                errors.Add($"Dòng {row}: Ngày bắt đầu không hợp lệ");
+                                continue;
+                            }
+
+                            if (!DateTime.TryParse(endStr, out DateTime endDate))
+                            {
+                                errors.Add($"Dòng {row}: Ngày kết thúc không hợp lệ");
+                                continue;
+                            }
+
+                            if (endDate <= startDate)
+                            {
+                                errors.Add($"Dòng {row}: Ngày kết thúc phải sau ngày bắt đầu");
+                                continue;
+                            }
+
+                            // Kiểm tra trùng mã (dùng mảng parameter đúng cách)
+                            int count = (int)DatabaseHelper.ExecuteScalar("SELECT COUNT(*) FROM Semesters WHERE SemesterCode = @code",
+                                new SqlParameter[] { new SqlParameter("@code", ma) });
+
+                            if (count > 0)
+                            {
+                                errors.Add($"Dòng {row}: Mã học kỳ '{ma}' đã tồn tại");
+                                continue;
+                            }
+
+                            // Insert (dùng mảng parameter)
+                            DatabaseHelper.ExecuteNonQuery(@"
+                                INSERT INTO Semesters (SemesterName, SemesterCode, StartDate, EndDate, Status)
+                                VALUES (@name, @code, @start, @end, @status)",
+                                new SqlParameter[] {
+                                    new SqlParameter("@name", ten),
+                                    new SqlParameter("@code", ma),
+                                    new SqlParameter("@start", startDate),
+                                    new SqlParameter("@end", endDate),
+                                    new SqlParameter("@status", string.IsNullOrWhiteSpace(status) ? "Sắp tới" : status)
+                                });
+
+                            success++;
+                        }
+
+                        LoadSemesters();
+
+                        string msg = $"Nhập thành công {success} học kỳ.";
+                        if (errors.Count > 0)
+                            msg += $"\n\nLỗi ({errors.Count} dòng):\n" + string.Join("\n", errors.Take(10));
+
+                        MessageBox.Show(msg, "Kết quả nhập", MessageBoxButtons.OK,
+                            errors.Count > 0 ? MessageBoxIcon.Warning : MessageBoxIcon.Information);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi nhập Excel: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void DgvSemesters_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
@@ -460,17 +628,17 @@ namespace StudentManagement.Forms
                     if (dgvSemesters.Columns.Count > 0)
                     {
                         // Total width available for data columns (excluding fixed-width columns)
-                        int availableWidth = newWidth - 150 - 80 - 80; // StatusBadge + Edit + Delete
+                        int availableWidth = newWidth - 150 - 20 - 20; // StatusBadge + Edit + Delete
 
                         // Set column widths proportionally
                         if (dgvSemesters.Columns.Contains("Tên học kỳ") && dgvSemesters.Columns["Tên học kỳ"] != null)
-                            dgvSemesters.Columns["Tên học kỳ"].Width = (int)(availableWidth * 0.35);
+                            dgvSemesters.Columns["Tên học kỳ"].Width = (int)(availableWidth * 0.25);
                         if (dgvSemesters.Columns.Contains("Mã học kỳ") && dgvSemesters.Columns["Mã học kỳ"] != null)
-                            dgvSemesters.Columns["Mã học kỳ"].Width = (int)(availableWidth * 0.20);
+                            dgvSemesters.Columns["Mã học kỳ"].Width = (int)(availableWidth * 0.15);
                         if (dgvSemesters.Columns.Contains("Ngày bắt đầu") && dgvSemesters.Columns["Ngày bắt đầu"] != null)
-                            dgvSemesters.Columns["Ngày bắt đầu"].Width = (int)(availableWidth * 0.22);
+                            dgvSemesters.Columns["Ngày bắt đầu"].Width = (int)(availableWidth * 0.20);
                         if (dgvSemesters.Columns.Contains("Ngày kết thúc") && dgvSemesters.Columns["Ngày kết thúc"] != null)
-                            dgvSemesters.Columns["Ngày kết thúc"].Width = (int)(availableWidth * 0.23);
+                            dgvSemesters.Columns["Ngày kết thúc"].Width = (int)(availableWidth * 0.20);
                     }
                 }
             }
