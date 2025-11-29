@@ -58,6 +58,7 @@ namespace StudentManagement.Forms
             int yPos = 100;
             AddMenuButton("📊 Tổng quan", yPos, (s, e) => LoadDashboard()); yPos += 50;
             AddMenuButton("📚 Môn học của tôi", yPos, (s, e) => LoadMyCourses()); yPos += 50;
+            AddMenuButton("📅 Lịch dạy của tôi", yPos, (s, e) => LoadScheduleManagement()); yPos += 50;
             AddMenuButton("👨‍🎓 Danh sách Sinh viên", yPos, (s, e) => LoadStudentList()); yPos += 50;
             AddMenuButton("✏️ Nhập điểm", yPos, (s, e) => LoadGradeEntry()); yPos += 50;
             AddMenuButton("📋 Xem điểm đã nhập", yPos, (s, e) => LoadGradeView()); yPos += 50;
@@ -160,12 +161,12 @@ namespace StudentManagement.Forms
                 };
 
                 string info = $@"Mã giảng viên: {SessionManager.CurrentTeacher.TeacherCode}
-Họ tên: {SessionManager.CurrentUser.FullName}
-Khoa: {SessionManager.CurrentTeacher.Department}
-Học vị: {SessionManager.CurrentTeacher.Degree}
-Chuyên môn: {SessionManager.CurrentTeacher.Specialization}
-Email: {SessionManager.CurrentUser.Email}
-Số điện thoại: {SessionManager.CurrentUser.Phone}";
+                    Họ tên: {SessionManager.CurrentUser.FullName}
+                    Khoa: {SessionManager.CurrentTeacher.Department}
+                    Học vị: {SessionManager.CurrentTeacher.Degree}
+                    Chuyên môn: {SessionManager.CurrentTeacher.Specialization}
+                    Email: {SessionManager.CurrentUser.Email}
+                    Số điện thoại: {SessionManager.CurrentUser.Phone}";
 
                 Label lblDetails = new Label
                 {
@@ -538,6 +539,19 @@ Số điện thoại: {SessionManager.CurrentUser.Phone}";
             gradeViewForm.Dock = DockStyle.Fill;
             panelContent.Controls.Add(gradeViewForm);
             gradeViewForm.Show();
+        }
+
+
+        private void LoadScheduleManagement()
+        {
+            panelContent.Controls.Clear();
+            // Giảng viên CHỈ XEM lịch dạy của chính họ, KHÔNG được phân lịch hay quản lý
+            TeacherScheduleViewForm form = new TeacherScheduleViewForm();
+            form.TopLevel = false;
+            form.FormBorderStyle = FormBorderStyle.None;
+            form.Dock = DockStyle.Fill;
+            panelContent.Controls.Add(form);
+            form.Show();
         }
 
         private void LoadProfile()

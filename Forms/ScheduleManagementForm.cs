@@ -196,11 +196,16 @@ namespace StudentManagement.Forms
                 AutoScroll=true
             };
 
+            panelContent.HorizontalScroll.Enabled = false;
+            panelContent.HorizontalScroll.Visible = false;
+            panelContent.HorizontalScroll.Maximum = 0;
+            panelContent.AutoScrollMinSize = new Size(0, 850); // đảm bảo có chỗ cuộn dọc
+
             // DataGridView
             dgvSchedules = new DataGridView
             {
                 Location = new Point(35, 230),
-                Dock = DockStyle.Fill,
+                Size= new (30,500),
                 Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
                 BackgroundColor = Color.White,
                 BorderStyle = BorderStyle.None,
@@ -213,7 +218,8 @@ namespace StudentManagement.Forms
                 RowHeadersVisible = false,
                 Font = new Font("Segoe UI", 9),
                 ColumnHeadersHeight = 50,
-                Width=160,
+                RowTemplate = { Height = 30 },
+                Width =160,
             };
 
             dgvSchedules.ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
@@ -257,7 +263,7 @@ namespace StudentManagement.Forms
             {
                 Text = "✏️ Sửa",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Location = new Point(30, 15),
+                Location = new Point(30,0),
                 Size = new Size(120, 40),
                 BackColor = Color.FromArgb(59, 130, 246),
                 ForeColor = Color.White,
@@ -272,7 +278,7 @@ namespace StudentManagement.Forms
             {
                 Text = "🗑️ Xóa",
                 Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Location = new Point(160, 15),
+                Location = new Point(160,0),
                 Size = new Size(120, 40),
                 BackColor = Color.FromArgb(239, 68, 68),
                 ForeColor = Color.White,
@@ -331,7 +337,7 @@ namespace StudentManagement.Forms
             // Use extension helpers for defensive assignment
             dgvSchedules.TrySetColumnWidth("CourseCode", (int)(totalWidth * 0.1));
             dgvSchedules.TrySetColumnWidth("CourseName", (int)(totalWidth * 0.20));
-            dgvSchedules.TrySetColumnWidth("DayName", (int)(totalWidth * 0.12));
+            dgvSchedules.TrySetColumnWidth("DayName", (int)(totalWidth * 0.08));
             dgvSchedules.TrySetColumnWidth("TimeSlotName", (int)(totalWidth * 0.18));
             dgvSchedules.TrySetColumnWidth("TimeRange", (int)(totalWidth * 0.12));
             dgvSchedules.TrySetColumnWidth("Room", (int)(totalWidth * 0.10));

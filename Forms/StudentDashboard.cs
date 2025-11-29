@@ -1,12 +1,11 @@
-using System.Linq;
-using StudentManagement.Data;
-using StudentManagement.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
 using System.Windows.Forms;
+using StudentManagement.Data;
+using StudentManagement.Helpers;
 
 namespace StudentManagement.Forms
 {
@@ -56,6 +55,7 @@ namespace StudentManagement.Forms
             AddMenuButton("📚 Môn học đã đăng ký", yPos, (s, e) => LoadMyCourses()); yPos += 50;
             AddMenuButton("📝 Xem điểm", yPos, (s, e) => LoadMyGrades()); yPos += 50;
             AddMenuButton("📖 Đăng ký môn học", yPos, (s, e) => LoadCourseRegistration()); yPos += 50;
+            AddMenuButton("💳 Thanh toán học phí", yPos, (s, e) => LoadPayment()); yPos += 50;
             AddMenuButton("📅 Lịch học", yPos, (s, e) => LoadSchedule()); yPos += 50;
             AddMenuButton("👤 Thông tin cá nhân", yPos, (s, e) => LoadProfile()); yPos += 50;
             AddMenuButton("🚪 Đăng xuất", yPos, (s, e) => Logout());
@@ -161,7 +161,7 @@ Số điện thoại: {SessionManager.CurrentUser.Phone}
                 {
                     Text = info,
                     Font = new Font("Segoe UI", 10),
-                    Location = new Point(20, 5),
+                    Location = new Point(20, 20),
                     AutoSize = true
                 };
                 infoPanel.Controls.Add(lblDetails);
@@ -253,55 +253,21 @@ Số điện thoại: {SessionManager.CurrentUser.Phone}
 
         private void LoadMyCourses()
         {
-            panelContent.Controls.Clear();
-
-            Label lblTitle = new Label
+            try
             {
-                Text = "MÔN HỌC ĐÃ ĐĂNG KÝ",
-                Font = new Font("Segoe UI", 18, FontStyle.Bold),
-                Location = new Point(20, 20),
-                AutoSize = true
-            };
-            panelContent.Controls.Add(lblTitle);
-
-            DataGridView dgv = new DataGridView
-            {
-                Location = new Point(20, 80),
-                Size = new Size(panelContent.Width - 60, panelContent.Height - 120),
-                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
-                ReadOnly = true,
-                AllowUserToAddRows = false,
-                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-                BackgroundColor = Color.White,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
-            };
-
-            string query = @"SELECT c.CourseCode, c.CourseName, c.Credits,
-                            u.FullName as TeacherName, c.Semester, c.AcademicYear,
-                            e.EnrollmentDate, e.Status
-                            FROM Enrollments e
-                            INNER JOIN Courses c ON e.CourseId = c.CourseId
-                            LEFT JOIN Teachers t ON c.TeacherId = t.TeacherId
-                            LEFT JOIN Users u ON t.UserId = u.UserId
-                            WHERE e.StudentId = @StudentId
-                            ORDER BY e.EnrollmentDate DESC";
-
-            dgv.DataSource = DatabaseHelper.ExecuteQuery(query,
-                new SqlParameter[] { new SqlParameter("@StudentId", SessionManager.CurrentStudent.StudentId) });
-
-            if (dgv.Columns.Count >= 8)
-            {
-                dgv.Columns[0].HeaderText = "Mã môn";
-                dgv.Columns[1].HeaderText = "Tên môn học";
-                dgv.Columns[2].HeaderText = "Số tín chỉ";
-                dgv.Columns[3].HeaderText = "Giảng viên";
-                dgv.Columns[4].HeaderText = "Học kỳ";
-                dgv.Columns[5].HeaderText = "Năm học";
-                dgv.Columns[6].HeaderText = "Ngày đăng ký";
-                dgv.Columns[7].HeaderText = "Trạng thái";
+                panelContent.Controls.Clear();
+                MyCoursesForm myCoursesForm = new MyCoursesForm();
+                myCoursesForm.TopLevel = false;
+                myCoursesForm.FormBorderStyle = FormBorderStyle.None;
+                myCoursesForm.Dock = DockStyle.Fill;
+                panelContent.Controls.Add(myCoursesForm);
+                myCoursesForm.Show();
             }
-
-            panelContent.Controls.Add(dgv);
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi mở danh sách môn học: " + ex.Message, "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void LoadMyGrades()
@@ -444,233 +410,260 @@ Số điện thoại: {SessionManager.CurrentUser.Phone}
 
             panelContent.Controls.Add(dgv);
         }
+
         private void LoadCourseRegistration()
         {
             panelContent.Controls.Clear();
 
             Label lblTitle = new Label
             {
-                Text = "ĐĂNG KÝ / HỦY MÔN HỌC",
-                Font = new Font("Segoe UI", 18F, FontStyle.Bold),
-                ForeColor = Color.FromArgb(52, 152, 219),
+                Text = "ĐĂNG KÝ MÔN HỌC",
+                Font = new Font("Segoe UI", 18, FontStyle.Bold),
                 Location = new Point(20, 20),
                 AutoSize = true
             };
             panelContent.Controls.Add(lblTitle);
 
-            Label lblSemester = new Label { Text = "Chọn học kỳ:", Font = new Font("Segoe UI", 10F), Location = new Point(20, 70), AutoSize = true };
+            Label lblSemester = new Label
+            {
+                Text = "Chọn học kỳ:",
+                Font = new Font("Segoe UI", 10),
+                Location = new Point(20, 70),
+                AutoSize = true
+            };
             panelContent.Controls.Add(lblSemester);
 
             ComboBox cboSemester = new ComboBox
             {
-                Location = new Point(120, 68),
+                Font = new Font("Segoe UI", 10),
+                Location = new Point(140, 68),
                 Size = new Size(180, 30),
-                DropDownStyle = ComboBoxStyle.DropDownList,
-                Font = new Font("Segoe UI", 10F)
+                DropDownStyle = ComboBoxStyle.DropDown
             };
-            cboSemester.Items.AddRange(new[] { "HK1-2024", "HK2-2024", "HK1-2025", "HK2-2025" });
-            cboSemester.SelectedIndex = 0;
+            // Add common semesters
+            int currentYear = DateTime.Now.Year;
+            for (int year = currentYear; year <= currentYear + 2; year++)
+            {
+                cboSemester.Items.Add($"HK1 {year}-{year + 1}");
+                cboSemester.Items.Add($"HK2 {year}-{year + 1}");
+                cboSemester.Items.Add($"HK3 {year}-{year + 1}");
+            }
             panelContent.Controls.Add(cboSemester);
 
             DataGridView dgv = new DataGridView
             {
-                Location = new Point(20, 110),
-                Size = new Size(panelContent.Width - 60, panelContent.Height - 220),
+                Location = new Point(20, 120),
+                Size = new Size(panelContent.Width - 60, panelContent.Height - 180),
                 Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
                 ReadOnly = true,
                 AllowUserToAddRows = false,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-                MultiSelect = true,
                 BackgroundColor = Color.White,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
-                RowHeadersVisible = false
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
             };
             panelContent.Controls.Add(dgv);
 
             Button btnRegister = new Button
             {
-                Text = "Đăng ký môn học",
-                Font = new Font("Segoe UI", 10F, FontStyle.Bold),
-                Size = new Size(200, 45),
+                Text = "Đăng ký môn học đã chọn",
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                Location = new Point(20, panelContent.Height - 60),
+                Size = new Size(200, 40),
                 Anchor = AnchorStyles.Bottom | AnchorStyles.Left,
-                Location = new Point(20, panelContent.Height - 80),
                 BackColor = Color.FromArgb(46, 204, 113),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Cursor = Cursors.Hand
             };
-            btnRegister.FlatAppearance.BorderSize = 0;
-            btnRegister.Click += (s, e) => RegisterSelectedCourses(dgv, cboSemester.SelectedItem.ToString());
+            btnRegister.Click += (s, e) => RegisterCourse(dgv);
             panelContent.Controls.Add(btnRegister);
 
-            Button btnCancel = new Button
+            // Setup event handler BEFORE setting SelectedIndex
+            cboSemester.SelectedIndexChanged += (s, e) =>
             {
-                Text = "Hủy đăng ký",
-                Font = new Font("Segoe UI", 10F, FontStyle.Bold),
-                Size = new Size(200, 45),
-                Anchor = AnchorStyles.Bottom | AnchorStyles.Left,
-                Location = new Point(240, panelContent.Height - 80),
-                BackColor = Color.FromArgb(231, 76, 60),
-                ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat,
-                Cursor = Cursors.Hand
+                if (cboSemester.SelectedItem != null)
+                {
+                    LoadAvailableCourses(dgv, cboSemester.SelectedItem.ToString());
+                }
             };
-            btnCancel.FlatAppearance.BorderSize = 0;
-            btnCancel.Click += (s, e) => CancelRegistration(dgv, cboSemester.SelectedItem.ToString());
-            panelContent.Controls.Add(btnCancel);
 
-            cboSemester.SelectedIndexChanged += (s, e) => LoadAvailableAndEnrolledCourses(dgv, cboSemester.SelectedItem.ToString());
-            LoadAvailableAndEnrolledCourses(dgv, cboSemester.SelectedItem.ToString());
+            // Set SelectedIndex AFTER adding dgv to form - this will trigger load
+            cboSemester.SelectedIndex = 0;
         }
 
-        private void LoadAvailableAndEnrolledCourses(DataGridView dgv, string semester)
+        private void LoadAvailableCourses(DataGridView dgv, string semester)
         {
-            string query = @"
-        SELECT 
-            c.CourseId,
-            c.CourseCode,
-            c.CourseName,
-            c.Credits,
-            ISNULL(u.FullName, N'Chưa phân công') AS TeacherName,
-            c.MaxStudents,
-            (SELECT COUNT(*) FROM Enrollments WHERE CourseId = c.CourseId) AS EnrolledCount,
-            CASE WHEN e.EnrollmentId IS NOT NULL THEN 1 ELSE 0 END AS IsEnrolled
-        FROM Courses c
-        LEFT JOIN Teachers t ON c.TeacherId = t.TeacherId
-        LEFT JOIN Users u ON t.UserId = u.UserId
-        LEFT JOIN Enrollments e ON c.CourseId = e.CourseId AND e.StudentId = @StudentId
-        WHERE c.Semester = @Semester AND c.IsActive = 1
-        ORDER BY IsEnrolled DESC, c.CourseCode";
+            string query = @"SELECT c.CourseId, c.CourseCode, c.CourseName, c.Credits,
+                            u.FullName as TeacherName, c.MaxStudents,
+                            (SELECT COUNT(*) FROM Enrollments WHERE CourseId = c.CourseId AND Status = N'Enrolled') as Enrolled
+                            FROM Courses c
+                            LEFT JOIN Teachers t ON c.TeacherId = t.TeacherId
+                            LEFT JOIN Users u ON t.UserId = u.UserId
+                            WHERE c.Semester = @Semester AND c.IsActive = 1
+                            AND c.CourseName NOT IN (
+                                SELECT c2.CourseName FROM Enrollments e
+                                INNER JOIN Courses c2 ON e.CourseId = c2.CourseId
+                                WHERE e.StudentId = @StudentId
+                                AND e.Status = N'Enrolled'
+                            )";
 
-            var dt = DatabaseHelper.ExecuteQuery(query, new[]
+            dgv.DataSource = DatabaseHelper.ExecuteQuery(query,
+                new SqlParameter[] {
+                    new SqlParameter("@Semester", semester),
+                    new SqlParameter("@StudentId", SessionManager.CurrentStudent.StudentId)
+                });
+
+            if (dgv.Columns.Count >= 7)
             {
-        new SqlParameter("@Semester", semester),
-        new SqlParameter("@StudentId", SessionManager.CurrentStudent.StudentId)
-    });
+                dgv.Columns[0].Visible = false; // Hide CourseId
+                dgv.Columns[1].HeaderText = "Mã môn";
+                dgv.Columns[2].HeaderText = "Tên môn học";
+                dgv.Columns[3].HeaderText = "Tín chỉ";
+                dgv.Columns[4].HeaderText = "Giảng viên";
+                dgv.Columns[5].HeaderText = "Sĩ số max";
+                dgv.Columns[6].HeaderText = "Đã đăng ký";
+            }
+        }
 
-            dgv.DataSource = dt;
-
-            if (dgv.Columns.Count > 0)
+        private void RegisterCourse(DataGridView dgv)
+        {
+            if (dgv.SelectedRows.Count == 0)
             {
-                dgv.Columns["CourseId"].Visible = false;
-                dgv.Columns["IsEnrolled"].Visible = false;
+                MessageBox.Show("Vui lòng chọn môn học cần đăng ký!", "Thông báo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
-                dgv.Columns["CourseCode"].HeaderText = "Mã môn";
-                dgv.Columns["CourseName"].HeaderText = "Tên môn học";
-                dgv.Columns["Credits"].HeaderText = "Tín chỉ";
-                dgv.Columns["TeacherName"].HeaderText = "Giảng viên";
-                dgv.Columns["MaxStudents"].HeaderText = "Sĩ số tối đa";
-                dgv.Columns["EnrolledCount"].HeaderText = "Đã đăng ký";
+            try
+            {
+                int courseId = Convert.ToInt32(dgv.SelectedRows[0].Cells["CourseId"].Value);
+                string courseName = dgv.SelectedRows[0].Cells[2].Value.ToString();
+                int studentId = SessionManager.CurrentStudent.StudentId;
 
-                // SỬA LỖI InvalidCastException TẠI ĐÂY
-                dgv.CellFormatting += (s, e) =>
+                DialogResult result = MessageBox.Show($"Bạn có chắc muốn đăng ký môn '{courseName}'?",
+                    "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (result == DialogResult.Yes)
                 {
-                    var row = dgv.Rows[e.RowIndex];
-                    var isEnrolledValue = row.Cells["IsEnrolled"].Value;
-
-                    // Chuyển 1/0 thành true/false an toàn
-                    bool isEnrolled = (isEnrolledValue is int intVal && intVal == 1) ||
-                                      (isEnrolledValue is bool boolVal && boolVal);
-
-                    if (isEnrolled)
+                    // Check if already enrolled (chỉ check các môn đang Enrolled, không check Cancelled)
+                    string checkQuery = "SELECT COUNT(*) FROM Enrollments WHERE StudentId = @StudentId AND CourseId = @CourseId AND Status = N'Enrolled'";
+                    object checkResult = DatabaseHelper.ExecuteScalar(checkQuery, new SqlParameter[]
                     {
-                        row.DefaultCellStyle.BackColor = Color.FromArgb(255, 253, 235);
-                        row.DefaultCellStyle.SelectionBackColor = Color.FromArgb(255, 200, 0);
+                        new SqlParameter("@StudentId", studentId),
+                        new SqlParameter("@CourseId", courseId)
+                    });
+
+                    if (Convert.ToInt32(checkResult) > 0)
+                    {
+                        MessageBox.Show("Bạn đã đăng ký môn học này rồi!", "Thông báo",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
                     }
-                };
-            }
-        }
 
-        private void RegisterSelectedCourses(DataGridView dgv, string semester)
-        {
-            var toRegister = dgv.SelectedRows.Cast<DataGridViewRow>()
-                .Where(r =>
-                {
-                    var val = r.Cells["IsEnrolled"].Value;
-                    bool enrolled = (val is int i && i == 1) || (val is bool b && b);
-                    return !enrolled;
-                })
-                .ToList();
+                    // Check course capacity
+                    string capacityQuery = @"
+                        SELECT c.MaxStudents, COUNT(e.EnrollmentId) as Enrolled
+                        FROM Courses c
+                        LEFT JOIN Enrollments e ON e.CourseId = c.CourseId AND e.Status = N'Enrolled'
+                        WHERE c.CourseId = @CourseId
+                        GROUP BY c.MaxStudents";
 
-            if (!toRegister.Any())
-            {
-                MessageBox.Show("Vui lòng chọn ít nhất một môn học chưa đăng ký!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+                    DataTable capacityData = DatabaseHelper.ExecuteQuery(capacityQuery, new SqlParameter[]
+                    {
+                        new SqlParameter("@CourseId", courseId)
+                    });
 
-            if (MessageBox.Show($"Đăng ký {toRegister.Count} môn học đã chọn?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
-                return;
+                    if (capacityData.Rows.Count > 0)
+                    {
+                        int maxStudents = capacityData.Rows[0]["MaxStudents"] != DBNull.Value ? Convert.ToInt32(capacityData.Rows[0]["MaxStudents"]) : 0;
+                        int enrolled = capacityData.Rows[0]["Enrolled"] != DBNull.Value ? Convert.ToInt32(capacityData.Rows[0]["Enrolled"]) : 0;
 
-            int success = 0;
-            foreach (DataGridViewRow row in toRegister)
-            {
-                try
-                {
-                    int courseId = (int)row.Cells["CourseId"].Value;
-                    DatabaseHelper.ExecuteNonQuery(
-                        "INSERT INTO Enrollments (StudentId, CourseId, EnrollmentDate, Status) VALUES (@StudentId, @CourseId, GETDATE(), 'Enrolled')",
-                        new SqlParameter[] {
-                            new SqlParameter("@StudentId", SessionManager.CurrentStudent.StudentId),
-                            new SqlParameter("@CourseId", courseId)
-                        });
-                    success++;
+                        if (maxStudents > 0 && enrolled >= maxStudents)
+                        {
+                            MessageBox.Show("Môn học đã đủ sĩ số. Không thể đăng ký!", "Thông báo",
+                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            return;
+                        }
+                    }
+
+                    // Check schedule conflicts
+                    string conflictQuery = @"
+                        SELECT COUNT(*)
+                        FROM Enrollments e1
+                        INNER JOIN Schedules s1 ON e1.CourseId = s1.CourseId
+                        INNER JOIN Schedules s2 ON s1.DayOfWeek = s2.DayOfWeek AND s1.TimeSlot = s2.TimeSlot
+                        WHERE e1.StudentId = @StudentId
+                        AND e1.Status = N'Enrolled'
+                        AND s2.CourseId = @CourseId";
+
+                    object conflictResult = DatabaseHelper.ExecuteScalar(conflictQuery, new SqlParameter[]
+                    {
+                        new SqlParameter("@StudentId", studentId),
+                        new SqlParameter("@CourseId", courseId)
+                    });
+
+                    if (Convert.ToInt32(conflictResult) > 0)
+                    {
+                        MessageBox.Show("Môn học này xung đột lịch với môn đã đăng ký!", "Lỗi xung đột lịch học",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    // Try to register via stored procedure to ensure atomic checks (capacity, conflict, duplicates)
+                    int spResult = DatabaseHelper.ExecuteNonQueryStoredProcedure("sp_RegisterStudentToCourse", new SqlParameter[] {
+                        new SqlParameter("@StudentId", studentId),
+                        new SqlParameter("@CourseId", courseId)
+                    });
+
+                    if (spResult == 0)
+                    {
+                        MessageBox.Show("Đăng ký môn học thành công!", "Thông báo",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else if (spResult == -1)
+                    {
+                        MessageBox.Show("Môn học đã đủ sĩ số. Không thể đăng ký!", "Thông báo",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                    else if (spResult == -2)
+                    {
+                        MessageBox.Show("Môn học này xung đột lịch với môn đã đăng ký!", "Lỗi xung đột lịch học",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                    else if (spResult == -3)
+                    {
+                        MessageBox.Show("Bạn đã đăng ký môn này trước đó.", "Thông báo",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Lỗi khi đăng ký môn học (mã lỗi: " + spResult + ")", "Lỗi",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    LoadCourseRegistration(); // Reload
                 }
-                catch { }
             }
-
-            LoadAvailableAndEnrolledCourses(dgv, semester);
-            MessageBox.Show($"Đăng ký thành công {success} môn học!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
-        private void CancelRegistration(DataGridView dgv, string semester)
-        {
-            var toCancel = dgv.SelectedRows.Cast<DataGridViewRow>()
-                .Where(r =>
-                {
-                    var val = r.Cells["IsEnrolled"].Value;
-                    bool enrolled = (val is int i && i == 1) || (val is bool b && b);
-                    return enrolled;
-                })
-                .ToList();
-
-            if (!toCancel.Any())
+            catch (SqlException sex)
             {
-                MessageBox.Show("Vui lòng chọn ít nhất một môn đã đăng ký để hủy!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                MessageBox.Show("Lỗi khi đăng ký môn: " + sex.Message, "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
-            if (MessageBox.Show($"Bạn có chắc muốn HỦY {toCancel.Count} môn học đã đăng ký?\nHành động này không thể hoàn tác!",
-                "Xác nhận hủy", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) != DialogResult.Yes)
-                return;
-
-            int success = 0;
-            foreach (DataGridViewRow row in toCancel)
+            catch (Exception ex)
             {
-                try
-                {
-                    int courseId = (int)row.Cells["CourseId"].Value;
-                    DatabaseHelper.ExecuteNonQuery(
-                        "DELETE FROM Enrollments WHERE StudentId = @StudentId AND CourseId = @CourseId",
-                        new SqlParameter[] {
-                            new SqlParameter("@StudentId", SessionManager.CurrentStudent.StudentId),
-                            new SqlParameter("@CourseId", courseId)
-                        });
-                    success++;
-                }
-                catch { }
+                MessageBox.Show("Lỗi: " + ex.Message, "Lỗi đăng ký",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
-            LoadAvailableAndEnrolledCourses(dgv, semester);
-            MessageBox.Show($"Đã hủy thành công {success} môn học!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
-
-        // Các hàm khác: LoadDashboard, LoadMyCourses, LoadMyGrades, LoadSchedule, LoadProfile, Logout... giữ nguyên như cũ
-        // (Không cần thay đổi)
 
         private void LoadSchedule()
         {
             panelContent.Controls.Clear();
-            var scheduleForm = new ScheduleForm();
+
+            ScheduleForm scheduleForm = new ScheduleForm();
             scheduleForm.TopLevel = false;
             scheduleForm.FormBorderStyle = FormBorderStyle.None;
             scheduleForm.Dock = DockStyle.Fill;
@@ -678,10 +671,35 @@ Số điện thoại: {SessionManager.CurrentUser.Phone}
             scheduleForm.Show();
         }
 
+        private void LoadPayment()
+        {
+            try
+            {
+                PaymentForm paymentForm = new PaymentForm();
+                if (paymentForm.ShowDialog() == DialogResult.OK)
+                {
+                    // Sau khi thanh toán thành công, hỏi có muốn xem lịch không
+                    var result = MessageBox.Show("Bạn có muốn xem thời khóa biểu không?",
+                        "Xem lịch học", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                    if (result == DialogResult.Yes)
+                    {
+                        LoadSchedule();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi mở form thanh toán: " + ex.Message, "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         private void LoadProfile()
         {
             panelContent.Controls.Clear();
-            var profileForm = new StudentProfileForm();
+
+            StudentProfileForm profileForm = new StudentProfileForm();
             profileForm.TopLevel = false;
             profileForm.FormBorderStyle = FormBorderStyle.None;
             profileForm.Dock = DockStyle.Fill;
@@ -691,7 +709,10 @@ Số điện thoại: {SessionManager.CurrentUser.Phone}
 
         private void Logout()
         {
-            if (MessageBox.Show("Bạn có chắc muốn đăng xuất?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            DialogResult result = MessageBox.Show("Bạn có chắc muốn đăng xuất?", "Xác nhận",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
             {
                 SessionManager.Logout();
                 this.Close();
