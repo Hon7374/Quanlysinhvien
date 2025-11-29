@@ -110,17 +110,6 @@ namespace StudentManagement.Forms
             };
             btnCancel.FlatAppearance.BorderSize = 0;
             btnCancel.Click += BtnCancel_Click;
-
-            // Create test account link
-            LinkLabel linkCreateTest = new LinkLabel
-            {
-                Text = "Tạo tài khoản test",
-                Location = new Point(50, 305),
-                AutoSize = true,
-                Font = new Font("Segoe UI", 8)
-            };
-            linkCreateTest.LinkClicked += (s, e) => CreateTestAccounts();
-
             // Add controls
             this.Controls.Add(lblTitle);
             this.Controls.Add(lblUsername);
@@ -130,7 +119,6 @@ namespace StudentManagement.Forms
             this.Controls.Add(chkRememberMe);
             this.Controls.Add(btnLogin);
             this.Controls.Add(btnCancel);
-            this.Controls.Add(linkCreateTest);
 
             // Set Enter key to login
             this.AcceptButton = btnLogin;
@@ -164,18 +152,32 @@ namespace StudentManagement.Forms
                     return;
                 }
 
-                // Query user
-                string query = "SELECT * FROM Users WHERE Username = @Username AND Password = @Password AND IsActive = 1";
-                SqlParameter[] parameters = {
-                    new SqlParameter("@Username", username),
-                    new SqlParameter("@Password", password)
-                };
+                // Query user by username, then verify password hash in code.
+                string query = "SELECT * FROM Users WHERE Username = @Username";
+                SqlParameter[] parameters = { new SqlParameter("@Username", username) };
 
                 DataTable dt = DatabaseHelper.ExecuteQuery(query, parameters);
 
                 if (dt.Rows.Count > 0)
                 {
                     DataRow row = dt.Rows[0];
+                    // Ensure account is active
+                    if (row["IsActive"] == DBNull.Value || Convert.ToBoolean(row["IsActive"]) == false)
+                    {
+                        MessageBox.Show("Tài khoản đang bị khóa hoặc không hoạt động.", "Đăng nhập thất bại",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    string storedHash = row.Table.Columns.Contains("PasswordHash") ? row["PasswordHash"].ToString() : (row.Table.Columns.Contains("Password") ? row["Password"].ToString() : null);
+
+                    // Validate password using PasswordHelper
+                    if (!PasswordHelper.VerifyPassword(password, storedHash))
+                    {
+                        MessageBox.Show("Tên đăng nhập hoặc mật khẩu không chính xác!", "Đăng nhập thất bại",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
 
                     // Create user object
                     SessionManager.CurrentUser = new User
@@ -311,41 +313,5 @@ namespace StudentManagement.Forms
             this.Close();
         }
 
-        private void CreateTestAccounts()
-        {
-            try
-            {
-                // Create student01
-                string checkUser = "SELECT COUNT(*) FROM Users WHERE Username = 'student01'";
-                int userExists = Convert.ToInt32(DatabaseHelper.ExecuteScalar(checkUser));
-
-                if (userExists == 0)
-                {
-                    string insertUser = @"INSERT INTO Users (Username, Password, FullName, Email, Phone, Role, IsActive)
-                                        VALUES ('student01', 'student123', N'Nguyễn Văn A', 'student01@example.com', '0901234567', 3, 1);
-                                        SELECT CAST(SCOPE_IDENTITY() as int)";
-                    int userId = Convert.ToInt32(DatabaseHelper.ExecuteScalar(insertUser));
-
-                    string insertStudent = @"INSERT INTO Students (UserId, StudentCode, Class, Major, AcademicYear, Status)
-                                           VALUES (@UserId, 'SV2024001', N'CNTT-K18', N'Công nghệ thông tin', 2024, N'Đang học')";
-                    DatabaseHelper.ExecuteNonQuery(insertStudent, new SqlParameter[] { new SqlParameter("@UserId", userId) });
-
-                    MessageBox.Show("Đã tạo tài khoản test:\n\nUsername: student01\nPassword: student123\nRole: Sinh viên",
-                        "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else
-                {
-                    // Update password
-                    DatabaseHelper.ExecuteNonQuery("UPDATE Users SET Password = 'student123', IsActive = 1 WHERE Username = 'student01'");
-                    MessageBox.Show("Tài khoản student01 đã tồn tại.\nĐã cập nhật mật khẩu thành: student123",
-                        "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Lỗi khi tạo tài khoản test: {ex.Message}", "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
     }
 }

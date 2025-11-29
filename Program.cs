@@ -16,6 +16,8 @@ namespace StudentManagement
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+            //Application.Run(new ScheduleManagementForm());
+
             // Show login form
             LoginForm loginForm = new LoginForm();
             DialogResult loginResult = loginForm.ShowDialog();

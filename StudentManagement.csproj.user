@@ -8,6 +8,9 @@
     <Compile Update="Forms\AdminDashboardModern.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="Forms\AutoScheduleForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="Forms\CourseCreateForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -15,6 +18,12 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Forms\CourseManagementForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\DatabaseUpdateForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\FixEnrollmentConstraintForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Forms\GradeEntryForm.cs">
@@ -26,10 +35,25 @@
     <Compile Update="Forms\LoginForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="Forms\MyCoursesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\PaymentForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="Forms\ReportsForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="Forms\ScheduleEditForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="Forms\ScheduleForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\ScheduleGridViewForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\ScheduleManagementForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Forms\SemesterCreateForm.cs">
@@ -72,6 +96,12 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Forms\TeacherProfileForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\TeacherScheduleGridViewForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\TeacherScheduleViewForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Forms\UserCreateForm.cs">

@@ -3,16 +3,16 @@
   "WorkspaceRootPath": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|c:\\users\\acer\\downloads\\quanlysinhvien\\forms\\scheduleform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|solutionrelative:forms\\scheduleform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|c:\\users\\acer\\downloads\\quanlysinhvien\\forms\\schedulemanagementform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|solutionrelative:forms\\schedulemanagementform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|c:\\users\\acer\\downloads\\quanlysinhvien\\forms\\admindashboardmodern.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|solutionrelative:forms\\admindashboardmodern.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|c:\\users\\acer\\downloads\\quanlysinhvien\\forms\\studentmanagementform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|solutionrelative:forms\\studentmanagementform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|c:\\users\\acer\\downloads\\quanlysinhvien\\forms\\studentcreateform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|solutionrelative:forms\\studentcreateform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|c:\\users\\acer\\downloads\\quanlysinhvien\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -22,7 +22,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Bookmark",
@@ -42,40 +42,42 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "ScheduleForm.cs",
-              "DocumentMoniker": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\ScheduleForm.cs",
-              "RelativeDocumentMoniker": "Forms\\ScheduleForm.cs",
-              "ToolTip": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\ScheduleForm.cs",
-              "RelativeToolTip": "Forms\\ScheduleForm.cs",
-              "ViewState": "AgIAAKUBAAAAAAAAAAAcwLEBAAAJAAAAAAAAAA==",
+              "DocumentIndex": 1,
+              "Title": "StudentManagementForm.cs",
+              "DocumentMoniker": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\StudentManagementForm.cs",
+              "RelativeDocumentMoniker": "Forms\\StudentManagementForm.cs",
+              "ToolTip": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\StudentManagementForm.cs",
+              "RelativeToolTip": "Forms\\StudentManagementForm.cs",
+              "ViewState": "AgIAANIAAAAAAAAAAAAYwN8AAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-26T14:47:14.882Z",
+              "WhenOpened": "2025-11-29T08:38:51.349Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "AdminDashboardModern.cs",
-              "DocumentMoniker": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\AdminDashboardModern.cs",
-              "RelativeDocumentMoniker": "Forms\\AdminDashboardModern.cs",
-              "ToolTip": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\AdminDashboardModern.cs",
-              "RelativeToolTip": "Forms\\AdminDashboardModern.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 0,
+              "Title": "ScheduleManagementForm.cs",
+              "DocumentMoniker": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\ScheduleManagementForm.cs",
+              "RelativeDocumentMoniker": "Forms\\ScheduleManagementForm.cs",
+              "ToolTip": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\ScheduleManagementForm.cs",
+              "RelativeToolTip": "Forms\\ScheduleManagementForm.cs",
+              "ViewState": "AgIAANsAAAAAAAAAAAAiwOcAAAAzAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-26T14:35:27.392Z"
+              "WhenOpened": "2025-11-29T08:37:34.579Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "StudentCreateForm.cs",
-              "DocumentMoniker": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\StudentCreateForm.cs",
-              "RelativeDocumentMoniker": "Forms\\StudentCreateForm.cs",
-              "ToolTip": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\StudentCreateForm.cs",
-              "RelativeToolTip": "Forms\\StudentCreateForm.cs",
-              "ViewState": "AgIAAGcBAAAAAAAAAAAYwHQBAABJAAAAAAAAAA==",
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADUAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-19T07:21:10.999Z"
+              "WhenOpened": "2025-11-29T07:32:39.419Z",
+              "EditorCaption": ""
             }
           ]
         }

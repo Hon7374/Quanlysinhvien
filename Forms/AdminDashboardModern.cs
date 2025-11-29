@@ -62,6 +62,7 @@ namespace StudentManagement.Forms
             AddMenuButton("👨‍🎓 Quản lý sinh viên", yPos, (s, e) => LoadStudentManagement()); yPos += 45;
             AddMenuButton("👨‍🏫 Quản lý giảng viên", yPos, (s, e) => LoadTeacherManagement()); yPos += 45;
             AddMenuButton("📖 Quản lý môn học", yPos, (s, e) => LoadCourseManagement()); yPos += 45;
+            AddMenuButton("📅 Phân lịch học", yPos, (s, e) => LoadScheduleManagement()); yPos += 45;
             AddMenuButton("📊 Thống kê và báo cáo", yPos, (s, e) => LoadReports()); yPos += 45;
             AddMenuButton("⚙️ Cài đặt", yPos, (s, e) => LoadSettings()); yPos += 60;
             AddMenuButton("🚪 Đăng xuất", yPos, (s, e) => Logout());
@@ -194,7 +195,14 @@ namespace StudentManagement.Forms
                 Size = new Size(120, 30),
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
-            cboSemester.Items.AddRange(new object[] { "Học kỳ I", "Học kỳ II", "Học kỳ III" });
+            // Add common semesters
+            int currentYear = DateTime.Now.Year;
+            for (int year = currentYear; year <= currentYear + 2; year++)
+            {
+                cboSemester.Items.Add($"HK1 {year}-{year + 1}");
+                cboSemester.Items.Add($"HK2 {year}-{year + 1}");
+                cboSemester.Items.Add($"HK3 {year}-{year + 1}");
+            }
             cboSemester.SelectedIndex = 0;
             panelFilters.Controls.Add(lblSemester);
             panelFilters.Controls.Add(cboSemester);
@@ -212,9 +220,9 @@ namespace StudentManagement.Forms
             panelFilters.Controls.Add(lblStatus);
             panelFilters.Controls.Add(cboStatus);
 
-                // Export Buttons
-                Button btnPDF = new Button
-                {
+            // Export Buttons
+            Button btnPDF = new Button
+            {
                     Text = "Xuất PDF",
                     Location = new System.Drawing.Point(560, 20),
                     Size = new Size(120, 35),
@@ -223,13 +231,13 @@ namespace StudentManagement.Forms
                     FlatStyle = FlatStyle.Flat,
                     Cursor = Cursors.Hand,
                     Font = new Font("Segoe UI", 10, FontStyle.Bold)
-                };
-                btnPDF.FlatAppearance.BorderSize = 0;
-                btnPDF.Click += (s, e) => ExportToPDF();
-                panelFilters.Controls.Add(btnPDF);
+            };
+            btnPDF.FlatAppearance.BorderSize = 0;
+            btnPDF.Click += (s, e) => ExportToPDF();
+            panelFilters.Controls.Add(btnPDF);
 
-                Button btnExcel = new Button
-                {
+            Button btnExcel = new Button
+            {
                     Text = "Xuất Excel",
                     Location = new System.Drawing.Point(700, 20),
                     Size = new Size(120, 35),
@@ -238,12 +246,12 @@ namespace StudentManagement.Forms
                     FlatStyle = FlatStyle.Flat,
                     Cursor = Cursors.Hand,
                     Font = new Font("Segoe UI", 10, FontStyle.Bold)
-                };
-                btnExcel.FlatAppearance.BorderSize = 0;
-                btnExcel.Click += (s, e) => ExportToExcel();
-                panelFilters.Controls.Add(btnExcel);
+            };
+            btnExcel.FlatAppearance.BorderSize = 0;
+            btnExcel.Click += (s, e) => ExportToExcel();
+            panelFilters.Controls.Add(btnExcel);
 
-                panelContent.Controls.Add(panelFilters);
+            panelContent.Controls.Add(panelFilters);
 
             try
             {
@@ -942,6 +950,26 @@ namespace StudentManagement.Forms
             catch (Exception ex)
             {
                 MessageBox.Show($"Lỗi khi tải trang quản lý môn học: {ex.Message}\n\nStack Trace: {ex.StackTrace}",
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void LoadScheduleManagement()
+        {
+            try
+            {
+                panelContent.Controls.Clear();
+
+                ScheduleManagementForm scheduleForm = new ScheduleManagementForm();
+                scheduleForm.TopLevel = false;
+                scheduleForm.FormBorderStyle = FormBorderStyle.None;
+                scheduleForm.Dock = DockStyle.Fill;
+                panelContent.Controls.Add(scheduleForm);
+                scheduleForm.Show();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi khi tải trang quản lý lịch học: {ex.Message}\n\nStack Trace: {ex.StackTrace}",
                     "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }

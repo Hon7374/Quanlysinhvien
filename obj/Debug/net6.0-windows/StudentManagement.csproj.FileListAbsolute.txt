@@ -63,18 +63,6 @@ C:\Users\Acer\Downloads\New folder (2)\bin\Debug\net6.0-windows\ExcelNumberForma
 C:\Users\Acer\Downloads\New folder (2)\bin\Debug\net6.0-windows\RBush.dll
 C:\Users\Acer\Downloads\New folder (2)\bin\Debug\net6.0-windows\SixLabors.Fonts.dll
 C:\Users\Acer\Downloads\New folder (2)\bin\Debug\net6.0-windows\System.IO.Packaging.dll
-C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\StudentManagement.csproj.AssemblyReference.cache
-C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\StudentManagement.Forms.CourseManagementForm.resources
-C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\StudentManagement.Forms.GradeEntryForm.resources
-C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\StudentManagement.Forms.GradeViewForm.resources
-C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\StudentManagement.Forms.StudentManagementForm.resources
-C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\StudentManagement.Forms.UserManagementForm.resources
-C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\StudentManagement.csproj.GenerateResource.cache
-C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\StudentManagement.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\StudentManagement.AssemblyInfoInputs.cache
-C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\StudentManagement.AssemblyInfo.cs
-C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\StudentManagement.csproj.CoreCompileInputs.cache
-C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\StudentManagement.sourcelink.json
 C:\Users\Acer\Downloads\Quanlysinhvien\bin\Debug\net6.0-windows\StudentManagement.exe
 C:\Users\Acer\Downloads\Quanlysinhvien\bin\Debug\net6.0-windows\StudentManagement.dll.config
 C:\Users\Acer\Downloads\Quanlysinhvien\bin\Debug\net6.0-windows\StudentManagement.deps.json
@@ -127,6 +115,18 @@ C:\Users\Acer\Downloads\Quanlysinhvien\bin\Debug\net6.0-windows\runtimes\win-x86
 C:\Users\Acer\Downloads\Quanlysinhvien\bin\Debug\net6.0-windows\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll
 C:\Users\Acer\Downloads\Quanlysinhvien\bin\Debug\net6.0-windows\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
 C:\Users\Acer\Downloads\Quanlysinhvien\bin\Debug\net6.0-windows\runtimes\win\lib\net6.0\System.Security.Cryptography.Pkcs.dll
+C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\StudentManagement.csproj.AssemblyReference.cache
+C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\StudentManagement.Forms.CourseManagementForm.resources
+C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\StudentManagement.Forms.GradeEntryForm.resources
+C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\StudentManagement.Forms.GradeViewForm.resources
+C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\StudentManagement.Forms.StudentManagementForm.resources
+C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\StudentManagement.Forms.UserManagementForm.resources
+C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\StudentManagement.csproj.GenerateResource.cache
+C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\StudentManagement.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\StudentManagement.AssemblyInfoInputs.cache
+C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\StudentManagement.AssemblyInfo.cs
+C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\StudentManagement.csproj.CoreCompileInputs.cache
+C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\StudentManagement.sourcelink.json
 C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\StudentM.FBDC7194.Up2Date
 C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\StudentManagement.dll
 C:\Users\Acer\Downloads\Quanlysinhvien\obj\Debug\net6.0-windows\refint\StudentManagement.dll

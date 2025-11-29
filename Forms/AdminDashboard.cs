@@ -50,12 +50,14 @@ namespace StudentManagement.Forms
 
             // Menu Buttons
             int yPos = 100;
-            AddMenuButton("📊 Tổng quan", yPos, (s, e) => LoadDashboard()); yPos += 50;
-            AddMenuButton("👨‍🎓 Quản lý Sinh viên", yPos, (s, e) => LoadStudentManagement()); yPos += 50;
-            AddMenuButton("👨‍🏫 Quản lý Giảng viên", yPos, (s, e) => LoadTeacherManagement()); yPos += 50;
-            AddMenuButton("📚 Quản lý Môn học", yPos, (s, e) => LoadCourseManagement()); yPos += 50;
-            AddMenuButton("👤 Quản lý Tài khoản", yPos, (s, e) => LoadUserManagement()); yPos += 50;
-            AddMenuButton("📈 Báo cáo Thống kê", yPos, (s, e) => LoadReports()); yPos += 50;
+            AddMenuButton("📊 Tổng quan", yPos, (s, e) => LoadDashboard()); yPos += 60;
+            AddMenuButton("👨‍🎓 Quản lý Sinh viên", yPos, (s, e) => LoadStudentManagement()); yPos += 60;
+            AddMenuButton("👨‍🏫 Quản lý Giảng viên", yPos, (s, e) => LoadTeacherManagement()); yPos += 60;
+            AddMenuButton("📚 Quản lý Môn học", yPos, (s, e) => LoadCourseManagement()); yPos += 60;
+            AddMenuButton("📅 Quản lý Thời khóa biểu", yPos, (s, e) => LoadScheduleManagement()); yPos += 60;
+            AddMenuButton("👤 Quản lý Tài khoản", yPos, (s, e) => LoadUserManagement()); yPos += 60;
+            AddMenuButton("📈 Báo cáo Thống kê", yPos, (s, e) => LoadReports()); yPos += 60;
+            AddMenuButton("🔄 Cập nhật Database", yPos, (s, e) => LoadDatabaseUpdate()); yPos += 60;
             AddMenuButton("🚪 Đăng xuất", yPos, (s, e) => Logout());
 
             // Content Panel
@@ -395,9 +397,28 @@ namespace StudentManagement.Forms
             MessageBox.Show("Chức năng quản lý tài khoản đang được phát triển!");
         }
 
+        private void LoadScheduleManagement()
+        {
+            panelContent.Controls.Clear();
+            ScheduleManagementForm form = new ScheduleManagementForm();
+            form.TopLevel = false;
+            form.FormBorderStyle = FormBorderStyle.None;
+            form.Dock = DockStyle.Fill;
+            panelContent.Controls.Add(form);
+            form.Show();
+        }
+
         private void LoadReports()
         {
             MessageBox.Show("Chức năng báo cáo thống kê đang được phát triển!");
+        }
+
+        private void LoadDatabaseUpdate()
+        {
+            DatabaseUpdateForm form = new DatabaseUpdateForm();
+            form.ShowDialog();
+            // Reload dashboard after update
+            LoadDashboard();
         }
 
         private void Logout()

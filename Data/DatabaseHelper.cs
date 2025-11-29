@@ -49,6 +49,7 @@ namespace StudentManagement.Data
                     conn.Open();
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
+                        cmd.CommandTimeout = 60;
                         if (parameters != null)
                         {
                             cmd.Parameters.AddRange(parameters);
@@ -62,7 +63,7 @@ namespace StudentManagement.Data
             }
             catch (Exception ex)
             {
-                throw new Exception("Error executing query: " + ex.Message);
+                throw new Exception("Error executing query.", ex);
             }
             return dataTable;
         }
@@ -76,6 +77,7 @@ namespace StudentManagement.Data
                     conn.Open();
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
+                        cmd.CommandTimeout = 60;
                         if (parameters != null)
                         {
                             cmd.Parameters.AddRange(parameters);
@@ -86,7 +88,7 @@ namespace StudentManagement.Data
             }
             catch (Exception ex)
             {
-                throw new Exception("Error executing non-query: " + ex.Message);
+                throw new Exception("Error executing non-query.", ex);
             }
         }
 
@@ -99,6 +101,7 @@ namespace StudentManagement.Data
                     conn.Open();
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
+                        cmd.CommandTimeout = 60;
                         if (parameters != null)
                         {
                             cmd.Parameters.AddRange(parameters);
@@ -109,7 +112,45 @@ namespace StudentManagement.Data
             }
             catch (Exception ex)
             {
-                throw new Exception("Error executing scalar: " + ex.Message);
+                throw new Exception("Error executing scalar.", ex);
+            }
+        }
+
+        public static int ExecuteNonQueryStoredProcedure(string spName, SqlParameter[] parameters = null)
+        {
+            try
+            {
+                using (SqlConnection conn = GetConnection())
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = new SqlCommand(spName, conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.CommandTimeout = 60; // Increase timeout to 60 seconds
+                        if (parameters != null)
+                        {
+                            cmd.Parameters.AddRange(parameters);
+                        }
+                        // Prepare to capture stored procedure return value
+                        var returnParameter = new SqlParameter("@RETURN_VALUE", SqlDbType.Int) { Direction = ParameterDirection.ReturnValue };
+                        cmd.Parameters.Add(returnParameter);
+
+                        cmd.ExecuteNonQuery();
+                        // Return the stored procedure integer return value if set, otherwise return rows affected
+                        try
+                        {
+                            if (returnParameter.Value != DBNull.Value && returnParameter.Value != null)
+                                return Convert.ToInt32(returnParameter.Value);
+                        }
+                        catch { }
+                        return 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Preserve the inner exception for diagnostics but provide context
+                throw new Exception("Error executing stored procedure: " + ex.Message, ex);
             }
         }
     }
