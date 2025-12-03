@@ -38,7 +38,7 @@ namespace StudentManagement.Forms
             // Welcome Label
             lblWelcome = new Label
             {
-                Text = $"Xin chào, {SessionManager.CurrentUser?.FullName ?? "Admin"}",
+                Text = $"Xin chào, {SessionManager.CurrentUser.FullName}",
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
                 ForeColor = Color.White,
                 Location = new Point(10, 20),

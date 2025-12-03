@@ -161,7 +161,7 @@ Số điện thoại: {SessionManager.CurrentUser.Phone}
                 {
                     Text = info,
                     Font = new Font("Segoe UI", 10),
-                    Location = new Point(20, 20),
+                    Location = new Point(20, 5),
                     AutoSize = true
                 };
                 infoPanel.Controls.Add(lblDetails);

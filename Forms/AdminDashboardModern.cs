@@ -64,7 +64,7 @@ namespace StudentManagement.Forms
             AddMenuButton("📖 Quản lý môn học", yPos, (s, e) => LoadCourseManagement()); yPos += 45;
             AddMenuButton("📅 Phân lịch học", yPos, (s, e) => LoadScheduleManagement()); yPos += 45;
             AddMenuButton("📊 Thống kê và báo cáo", yPos, (s, e) => LoadReports()); yPos += 45;
-            AddMenuButton("⚙️ Cài đặt", yPos, (s, e) => LoadSettings()); yPos += 60;
+            AddMenuButton("⚙️ Thông tin cá nhân", yPos, (s, e) => LoadSettings()); yPos += 60;
             AddMenuButton("🚪 Đăng xuất", yPos, (s, e) => Logout());
 
             // Header Panel
