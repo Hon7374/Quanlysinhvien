@@ -337,13 +337,13 @@ namespace StudentManagement.Forms
                     return;
                 }
 
-                if (paymentStatus == "Đã thanh toán")
-                {
-                    MessageBox.Show("Không thể hủy môn đã thanh toán học phí!\n\n" +
-                        "Vui lòng liên hệ phòng đào tạo để được hỗ trợ.", "Không thể hủy",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
+                //if (paymentStatus == "Đã thanh toán")
+                //{
+                //    MessageBox.Show("Không thể hủy môn đã thanh toán học phí!\n\n" +
+                //        "Vui lòng liên hệ phòng đào tạo để được hỗ trợ.", "Không thể hủy",
+                //        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                //    return;
+                //}
 
                 // Xác nhận hủy
                 var result = MessageBox.Show(
@@ -372,11 +372,11 @@ namespace StudentManagement.Forms
                             MessageBoxButtons.OK, MessageBoxIcon.Information);
                         LoadMyCourses();
                     }
-                    else if (spResult == -3)
-                    {
-                        MessageBox.Show("Không thể hủy môn đã thanh toán học phí.", "Không thể hủy",
-                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    }
+                    //else if (spResult == -3)
+                    //{
+                    //    MessageBox.Show("Không thể hủy môn đã thanh toán học phí.", "Không thể hủy",
+                    //        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    //}
                     else if (spResult == -4)
                     {
                         MessageBox.Show("Đã quá thời hạn cho phép hủy môn.", "Không thể hủy",
@@ -406,11 +406,11 @@ namespace StudentManagement.Forms
                 // Xử lý các lỗi từ stored procedure
                 string message = "Lỗi khi hủy môn học:\n\n";
 
-                if (sqlEx.Message.Contains("Không thể hủy môn đã thanh toán"))
-                {
-                    message += "Không thể hủy môn đã thanh toán học phí.";
-                }
-                else if (sqlEx.Message.Contains("Đã quá thời hạn"))
+                //if (sqlEx.Message.Contains("Không thể hủy môn đã thanh toán"))
+                //{
+                //    message += "Không thể hủy môn đã thanh toán học phí.";
+                //}
+                if (sqlEx.Message.Contains("Đã quá thời hạn"))
                 {
                     message += "Đã quá thời hạn cho phép hủy môn.\n" +
                               "Vui lòng liên hệ phòng đào tạo để được hỗ trợ.";
