@@ -3,20 +3,36 @@
   "WorkspaceRootPath": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|c:\\users\\acer\\downloads\\quanlysinhvien\\forms\\admindashboard.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|solutionrelative:forms\\admindashboard.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|c:\\users\\acer\\downloads\\quanlysinhvien\\forms\\teacherdashboard.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|solutionrelative:forms\\teacherdashboard.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|c:\\users\\acer\\downloads\\quanlysinhvien\\forms\\studentdashboard.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|solutionrelative:forms\\studentdashboard.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|c:\\users\\acer\\downloads\\quanlysinhvien\\forms\\admindashboardmodern.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|solutionrelative:forms\\admindashboardmodern.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|c:\\users\\acer\\downloads\\quanlysinhvien\\forms\\teacherprofileform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|solutionrelative:forms\\teacherprofileform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|c:\\users\\acer\\downloads\\quanlysinhvien\\forms\\studentprofileform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|solutionrelative:forms\\studentprofileform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|c:\\users\\acer\\downloads\\quanlysinhvien\\forms\\scheduleform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|solutionrelative:forms\\scheduleform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|c:\\users\\acer\\downloads\\quanlysinhvien\\forms\\paymentform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|solutionrelative:forms\\paymentform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|c:\\users\\acer\\downloads\\quanlysinhvien\\forms\\loginform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|solutionrelative:forms\\loginform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|c:\\users\\acer\\downloads\\quanlysinhvien\\forms\\admindashboard.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|solutionrelative:forms\\admindashboard.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|c:\\users\\acer\\downloads\\quanlysinhvien\\forms\\admindashboardmodern.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|solutionrelative:forms\\admindashboardmodern.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{6B3D0304-3F30-45CC-B3CC-7C365A494517}|StudentManagement.csproj|c:\\users\\acer\\downloads\\quanlysinhvien\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -50,7 +66,84 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "StudentDashboard.cs",
+              "DocumentMoniker": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\StudentDashboard.cs",
+              "RelativeDocumentMoniker": "Forms\\StudentDashboard.cs",
+              "ToolTip": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\StudentDashboard.cs",
+              "RelativeToolTip": "Forms\\StudentDashboard.cs",
+              "ViewState": "AgIAAIsAAAAAAAAAAAAkwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-04T03:51:00.063Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "TeacherDashboard.cs",
+              "DocumentMoniker": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\TeacherDashboard.cs",
+              "RelativeDocumentMoniker": "Forms\\TeacherDashboard.cs",
+              "ToolTip": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\TeacherDashboard.cs",
+              "RelativeToolTip": "Forms\\TeacherDashboard.cs",
+              "ViewState": "AgIAAJQAAAAAAAAAAAAkwKEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-04T03:49:32.094Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 2,
+              "Title": "TeacherProfileForm.cs",
+              "DocumentMoniker": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\TeacherProfileForm.cs",
+              "RelativeDocumentMoniker": "Forms\\TeacherProfileForm.cs",
+              "ToolTip": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\TeacherProfileForm.cs",
+              "RelativeToolTip": "Forms\\TeacherProfileForm.cs",
+              "ViewState": "AgIAAIQBAAAAAAAAAAAkwAwAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-04T03:46:39.891Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ScheduleForm.cs",
+              "DocumentMoniker": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\ScheduleForm.cs",
+              "RelativeDocumentMoniker": "Forms\\ScheduleForm.cs",
+              "ToolTip": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\ScheduleForm.cs",
+              "RelativeToolTip": "Forms\\ScheduleForm.cs",
+              "ViewState": "AgIAADQBAAAAAAAAAAAswEUBAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-04T03:22:19.939Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "PaymentForm.cs",
+              "DocumentMoniker": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\PaymentForm.cs",
+              "RelativeDocumentMoniker": "Forms\\PaymentForm.cs",
+              "ToolTip": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\PaymentForm.cs",
+              "RelativeToolTip": "Forms\\PaymentForm.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-03T13:13:49.591Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "LoginForm.cs",
+              "DocumentMoniker": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\LoginForm.cs",
+              "RelativeDocumentMoniker": "Forms\\LoginForm.cs",
+              "ToolTip": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\LoginForm.cs",
+              "RelativeToolTip": "Forms\\LoginForm.cs",
+              "ViewState": "AgIAAMsAAAAAAAAAAAAgwOAAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-03T12:32:56.454Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
               "Title": "AdminDashboardModern.cs",
               "DocumentMoniker": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\AdminDashboardModern.cs",
               "RelativeDocumentMoniker": "Forms\\AdminDashboardModern.cs",
@@ -58,50 +151,23 @@
               "RelativeToolTip": "Forms\\AdminDashboardModern.cs",
               "ViewState": "AgIAAA4AAAAAAAAAAAAAwEIAAAAvAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-03T08:37:42.153Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-12-03T08:37:42.153Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 6,
               "Title": "AdminDashboard.cs",
               "DocumentMoniker": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\AdminDashboard.cs",
               "RelativeDocumentMoniker": "Forms\\AdminDashboard.cs",
               "ToolTip": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\AdminDashboard.cs",
               "RelativeToolTip": "Forms\\AdminDashboard.cs",
-              "ViewState": "AgIAABsAAAAAAAAAAAAYwDQAAABXAAAAAAAAAA==",
+              "ViewState": "AgIAAB0AAAAAAAAAAAAcwDoAAABcAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-03T08:37:21.175Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-12-03T08:37:21.175Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "StudentDashboard.cs",
-              "DocumentMoniker": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\StudentDashboard.cs",
-              "RelativeDocumentMoniker": "Forms\\StudentDashboard.cs",
-              "ToolTip": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\StudentDashboard.cs",
-              "RelativeToolTip": "Forms\\StudentDashboard.cs",
-              "ViewState": "AgIAABYAAAAAAAAAAAAQwCkAAABIAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-30T13:15:46.778Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "StudentProfileForm.cs",
-              "DocumentMoniker": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\StudentProfileForm.cs",
-              "RelativeDocumentMoniker": "Forms\\StudentProfileForm.cs",
-              "ToolTip": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Forms\\StudentProfileForm.cs",
-              "RelativeToolTip": "Forms\\StudentProfileForm.cs",
-              "ViewState": "AgIAACAAAAAAAAAAAAAAwCYAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-30T12:36:36.772Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 8,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\Acer\\Downloads\\Quanlysinhvien\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",

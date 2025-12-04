@@ -161,12 +161,12 @@ namespace StudentManagement.Forms
                 };
 
                 string info = $@"Mã giảng viên: {SessionManager.CurrentTeacher.TeacherCode}
-                    Họ tên: {SessionManager.CurrentUser.FullName}
-                    Khoa: {SessionManager.CurrentTeacher.Department}
-                    Học vị: {SessionManager.CurrentTeacher.Degree}
-                    Chuyên môn: {SessionManager.CurrentTeacher.Specialization}
-                    Email: {SessionManager.CurrentUser.Email}
-                    Số điện thoại: {SessionManager.CurrentUser.Phone}";
+Họ tên: {SessionManager.CurrentUser.FullName}
+Khoa: {SessionManager.CurrentTeacher.Department}
+Học vị: {SessionManager.CurrentTeacher.Degree}
+Chuyên môn: {SessionManager.CurrentTeacher.Specialization}
+Email: {SessionManager.CurrentUser.Email}
+Số điện thoại: {SessionManager.CurrentUser.Phone}";
 
                 Label lblDetails = new Label
                 {

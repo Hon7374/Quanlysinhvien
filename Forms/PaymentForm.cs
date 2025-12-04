@@ -652,7 +652,6 @@ namespace StudentManagement.Forms
                         }
                     }
                 }
-
                 lblStatus.Text = "✅ Mã QR đã sẵn sàng";
                 lblStatus.ForeColor = Color.FromArgb(46, 204, 113);
                 btnRefreshQR.Enabled = true;
